@@ -1,0 +1,358 @@
+<!-- filepath: /Users/pc/Documents/project/LINE/reservations/templates/reservations/calendar.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>{{ tenant.name|escape }} - 予約カレンダー</title>
+    <meta name="description" content="{{ tenant.name|escape }}の予約カレンダー">
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 20px; 
+            background-color: #f8f9fa;
+        }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .tenant-info { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white;
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+        }
+        .week-nav { 
+            text-align: center; 
+            margin-bottom: 20px; 
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .week-nav a { 
+            margin: 0 20px; 
+            padding: 10px 20px; 
+            background: #007bff; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 6px;
+            transition: background-color 0.3s;
+        }
+        .week-nav a:hover { background: #0056b3; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-bottom: 20px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td { border: 1px solid #dee2e6; padding: 12px; text-align: center; }
+        th { background: #343a40; color: white; font-weight: 600; }
+        .closed-day { background: #e9ecef; color: #6c757d; }
+        .available-slot { 
+            background: none; 
+            border: none; 
+            font-size: 16px; 
+            cursor: pointer; 
+            color: #28a745;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        .available-slot:hover { background: #d4edda; transform: scale(1.05); }
+        .reserved-slot { color: #dc3545; font-weight: bold; }
+        .unavailable-slot { color: #6c757d; }
+        
+        .modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(3px);
+        }
+        .modal-content { 
+            background: #fff; 
+            margin: 5% auto; 
+            padding: 30px; 
+            border-radius: 12px; 
+            width: 500px; 
+            max-width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .close { 
+            float: right; 
+            font-size: 32px; 
+            cursor: pointer; 
+            color: #aaa;
+            transition: color 0.3s;
+        }
+        .close:hover { color: #000; }
+        .form-group { margin-bottom: 20px; }
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            color: #495057;
+        }
+        input, select { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid #dee2e6; 
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+        input:focus, select:focus { 
+            outline: none; 
+            border-color: #007bff; 
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+        }
+        .btn { 
+            padding: 12px 24px; 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn:hover { background: #0056b3; transform: translateY(-1px); }
+        .btn:disabled { background: #6c757d; cursor: not-allowed; transform: none; }
+        
+        .security-badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ tenant.name|escape }} 予約カレンダー <span class="security-badge">SSL保護</span></h1>
+        
+        <!-- テナント情報 -->
+        <div class="tenant-info">
+            <h3>📋 営業情報</h3>
+            <p><strong>🕒 営業時間:</strong> {{ tenant.start_time|time:'H:i' }} - {{ tenant.end_time|time:'H:i' }}</p>
+            <p><strong>⏱️ 予約枠:</strong> {{ tenant.slot_duration }}分間隔</p>
+            <p><strong>📅 予約可能時間:</strong> 現在時刻から{{ tenant.advance_hours }}時間後以降</p>
+            <p><strong>📆 営業日:</strong>
+                {% if tenant.monday_open %}月{% endif %}
+                {% if tenant.tuesday_open %}火{% endif %}
+                {% if tenant.wednesday_open %}水{% endif %}
+                {% if tenant.thursday_open %}木{% endif %}
+                {% if tenant.friday_open %}金{% endif %}
+                {% if tenant.saturday_open %}土{% endif %}
+                {% if tenant.sunday_open %}日{% endif %}
+            </p>
+        </div>
+
+        <!-- 週ナビゲーション -->
+        <div class="week-nav">
+            <a href="{% url 'calendar_by_tenant' tenant.slug %}?week_offset={{ week_offset|add:'-1' }}">← 前週</a>
+            <span><strong>{{ week_days.0|date:'Y年m月d日' }} 〜 {{ week_days.6|date:'m月d日' }}</strong></span>
+            <a href="{% url 'calendar_by_tenant' tenant.slug %}?week_offset={{ week_offset|add:'1' }}">次週 →</a>
+        </div>
+
+        <!-- カレンダーテーブル -->
+        <table>
+            <thead>
+                <tr>
+                    <th>時間 / 日付</th>
+                    {% for day in week_days %}
+                        <th>{{ day|date:'m/d' }}<br>({{ day|date:'D' }})</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in calendar_rows %}
+                <tr>
+                    <td><strong>{{ row.0.slot|time:'H:i' }}</strong></td>
+                    {% for cell in row %}
+                        <td class="{% if not cell.is_open_day %}closed-day{% endif %}">
+                            {% if not cell.is_open_day %}
+                                🚫 休業日
+                            {% elif cell.reservation %}
+                                <div class="reserved-slot">❌ 予約済み</div>
+                            {% elif cell.available %}
+                                <button class="available-slot" onclick="openReserveModal('{{ cell.day|date:'Y-m-d' }}', '{{ cell.slot|time:'H:i' }}')">
+                                    <span style="font-size: 20px;">✅</span><br>
+                                    <small>予約可能</small>
+                                </button>
+                            {% else %}
+                                <span class="unavailable-slot">⏰<br><small>予約不可</small></span>
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- 予約モーダル -->
+        <div id="reserveModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2>📝 予約フォーム</h2>
+                <form id="reserveForm" method="post" action="{% url 'reserve_slot_by_tenant' tenant.slug %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="date" id="reserveDate">
+                    <input type="hidden" name="time_slot" id="reserveTime">
+                    
+                    <div class="form-group">
+                        <label>📅 予約日時:</label>
+                        <div id="reserveDateTime" style="font-size: 18px; color: #007bff; font-weight: bold; padding: 10px; background: #f8f9fa; border-radius: 4px;"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="menu_id">🍽️ メニュー選択:</label>
+                        <select name="menu_id" id="menu_id" required>
+                            <option value="">メニューを選択してください</option>
+                            {% for menu in tenant.menus.all %}
+                                <option value="{{ menu.id }}">
+                                    {{ menu.name|escape }}
+                                    {% if menu.price %} - ¥{{ menu.price|floatformat:0 }}{% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="customer_name">👤 お名前:</label>
+                        <input type="text" name="customer_name" id="customer_name" required maxlength="100" placeholder="お名前を入力してください" autocomplete="name">
+                    </div>
+                    
+                    <div class="form-group" style="text-align: center; margin-top: 30px;">
+                        <button type="button" onclick="closeModal()" style="margin-right: 15px; background: #6c757d;">キャンセル</button>
+                        <button type="submit" class="btn">🎯 予約する</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CSRFトークンを取得
+        function getCSRFToken() {
+            return document.querySelector('[name=csrfmiddlewaretoken]').value;
+        }
+
+        function openReserveModal(date, time) {
+            // XSS対策: 入力値をサニタイズ
+            const sanitizedDate = date.replace(/[<>&"']/g, '');
+            const sanitizedTime = time.replace(/[<>&"']/g, '');
+            
+            // フォームをリセット
+            document.getElementById('reserveForm').reset();
+            
+            // 日時を設定
+            document.getElementById('reserveDate').value = sanitizedDate;
+            document.getElementById('reserveTime').value = sanitizedTime;
+            
+            // 日時を表示用にフォーマット
+            try {
+                const dateObj = new Date(sanitizedDate + 'T' + sanitizedTime);
+                const options = { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric', 
+                    weekday: 'long',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                document.getElementById('reserveDateTime').textContent = dateObj.toLocaleDateString('ja-JP', options);
+            } catch (e) {
+                console.error('日時のフォーマットエラー:', e);
+                document.getElementById('reserveDateTime').textContent = sanitizedDate + ' ' + sanitizedTime;
+            }
+            
+            // モーダルを表示
+            document.getElementById('reserveModal').style.display = 'block';
+            document.body.style.overflow = 'hidden'; // スクロール防止
+        }
+
+        function closeModal() {
+            document.getElementById('reserveModal').style.display = 'none';
+            document.body.style.overflow = 'auto'; // スクロール復元
+        }
+
+        // モーダル外クリックで閉じる
+        window.onclick = function(event) {
+            const modal = document.getElementById('reserveModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // ESCキーでモーダルを閉じる
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // フォーム送信処理（セキュリティ強化）
+        document.getElementById('reserveForm').onsubmit = function(e) {
+            e.preventDefault();
+            
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.disabled = true;
+            submitButton.textContent = '⏳ 予約中...';
+            
+            // 入力値検証
+            const customerName = document.getElementById('customer_name').value.trim();
+            if (!customerName || customerName.length > 100) {
+                alert('お名前は1文字以上100文字以内で入力してください。');
+                submitButton.disabled = false;
+                submitButton.textContent = originalText;
+                return;
+            }
+            
+            const formData = new FormData(this);
+            fetch(this.action, {
+                method: 'POST',
+                headers: { 
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('✅ 予約が完了しました！');
+                    closeModal();
+                    setTimeout(() => location.reload(), 500);
+                } else {
+                    throw new Error('予約に失敗しました');
+                }
+            })
+            .catch(error => {
+                console.error('予約エラー:', error);
+                alert('❌ 予約に失敗しました。すでに予約が入っているか、ネットワークエラーが発生しました。');
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.textContent = originalText;
+            });
+        }
+        
+        // ページ読み込み完了時の初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('予約カレンダーが読み込まれました');
+        });
+    </script>
+</body>
+</html>

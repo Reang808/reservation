@@ -1,0 +1,171 @@
+<!-- filepath: /Users/pc/Documents/project/LINE/reservations/templates/reservations/owner_menu_confirm_delete.html -->
+{% extends 'base.html' %}
+
+{% block title %}メニュー削除確認 - {{ tenant.name|escape }}{% endblock %}
+
+{% block extra_head %}
+<meta name="robots" content="noindex, nofollow">
+<style>
+    .delete-confirmation {
+        max-width: 600px;
+        margin: 40px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    .warning-icon {
+        font-size: 80px;
+        color: #dc3545;
+        margin-bottom: 20px;
+    }
+    .menu-info {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 20px;
+        margin: 20px 0;
+        text-align: left;
+    }
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 30px;
+    }
+    .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+    .btn-danger:hover {
+        background: #c82333;
+        transform: translateY(-1px);
+    }
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+    .btn-secondary:hover {
+        background: #545b62;
+        color: white;
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+    .security-warning {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        color: #856404;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+    @media (max-width: 768px) {
+        .action-buttons {
+            flex-direction: column;
+        }
+        .delete-confirmation {
+            margin: 20px;
+            padding: 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-confirmation">
+    <div class="warning-icon">⚠️</div>
+    
+    <h2>メニュー削除確認</h2>
+    
+    <div class="security-warning">
+        <strong>🔒 重要:</strong> この操作は取り消すことができません。メニューに関連する予約データも影響を受ける可能性があります。
+    </div>
+    
+    <p style="font-size: 18px; color: #495057;">
+        本当に以下のメニューを削除しますか？
+    </p>
+    
+    <div class="menu-info">
+        <h4>📋 削除対象メニュー</h4>
+        <p><strong>🏪 店舗名:</strong> {{ tenant.name|escape }}</p>
+        <p><strong>🍽️ メニュー名:</strong> {{ menu.name|escape }}</p>
+        {% if menu.description %}
+            <p><strong>📝 説明:</strong> {{ menu.description|escape }}</p>
+        {% endif %}
+        {% if menu.price %}
+            <p><strong>💰 価格:</strong> ¥{{ menu.price|floatformat:0 }}</p>
+        {% endif %}
+        <p><strong>📅 作成日:</strong> {{ menu.created_at|date:"Y年m月d日 H:i"|default:"不明" }}</p>
+    </div>
+    
+    <form method="post" id="deleteForm">
+        {% csrf_token %}
+        <div class="action-buttons">
+            <a href="{% url 'owner_menu_list_by_tenant' tenant.slug %}" class="btn btn-secondary">
+                ← キャンセル
+            </a>
+            <button type="submit" class="btn btn-danger" id="deleteBtn">
+                🗑️ 削除する
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+// 削除確認ダイアログ
+document.getElementById('deleteForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const menuName = "{{ menu.name|escape|escapejs }}";
+    const confirmMessage = `本当に「${menuName}」を削除しますか？\n\nこの操作は取り消すことができません。`;
+    
+    if (confirm(confirmMessage)) {
+        // ボタンを無効化してスパム防止
+        const deleteBtn = document.getElementById('deleteBtn');
+        deleteBtn.disabled = true;
+        deleteBtn.textContent = '🔄 削除中...';
+        
+        // フォームを送信
+        this.submit();
+    }
+});
+
+// ESCキーでキャンセル
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const cancelUrl = "{% url 'owner_menu_list_by_tenant' tenant.slug %}";
+        if (confirm('削除をキャンセルしてメニュー一覧に戻りますか？')) {
+            window.location.href = cancelUrl;
+        }
+    }
+});
+
+// ページ読み込み時の初期化
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('メニュー削除確認ページが読み込まれました');
+    
+    // セキュリティ警告を5秒後に強調表示
+    setTimeout(() => {
+        const warning = document.querySelector('.security-warning');
+        if (warning) {
+            warning.style.background = '#f8d7da';
+            warning.style.borderColor = '#f5c6cb';
+            warning.style.color = '#721c24';
+        }
+    }, 5000);
+});
+</script>
+{% endblock %}

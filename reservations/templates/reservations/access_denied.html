@@ -1,0 +1,93 @@
+<!-- filepath: /Users/pc/Documents/project/LINE/reservations/templates/reservations/access_denied.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>アクセス拒否 - 予約システム</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 40px; 
+            text-align: center; 
+            background-color: #f8f9fa;
+        }
+        .error-container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .error-icon { 
+            font-size: 80px; 
+            color: #dc3545; 
+            margin-bottom: 20px; 
+        }
+        .error-title { 
+            font-size: 32px; 
+            color: #343a40; 
+            margin-bottom: 20px; 
+        }
+        .error-message { 
+            font-size: 18px; 
+            color: #6c757d; 
+            margin-bottom: 30px; 
+            line-height: 1.5;
+        }
+        .btn { 
+            display: inline-block;
+            padding: 12px 24px; 
+            background: #007bff; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .security-notice {
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon">🚫</div>
+        <h1 class="error-title">アクセスが拒否されました</h1>
+        
+        {% if message %}
+            <p class="error-message">{{ message|escape }}</p>
+        {% else %}
+            <p class="error-message">
+                このページにアクセスする権限がありません。<br>
+                {% if required_roles %}
+                    必要な権限: {{ required_roles|join:", "|escape }}<br>
+                {% endif %}
+                {% if user_role %}
+                    あなたの権限: {{ user_role|escape }}
+                {% endif %}
+            </p>
+        {% endif %}
+        
+        <div class="security-notice">
+            <strong>セキュリティ通知:</strong> 
+            このアクセス試行は記録されています。不正なアクセスが続く場合は、
+            管理者に通報される可能性があります。
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <a href="/" class="btn">ログインページに戻る</a>
+        </div>
+    </div>
+</body>
+</html>

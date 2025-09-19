@@ -1,0 +1,165 @@
+<!-- filepath: /Users/pc/Documents/project/LINE/reservations/templates/reservations/login.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>ログイン - 予約システム</title>
+    <style>
+        // ...existing code...
+        .btn-login:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .security-notice {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .customer-link {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 5px 5px 5px 0;
+            transition: all 0.3s;
+        }
+        .customer-link:hover {
+            background: #218838;
+            color: white;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 20px;
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>🏪 予約システム</h1>
+            <p>事業者ログイン</p>
+        </div>
+
+        <div class="security-notice">
+            🔒 <strong>セキュリティ保護:</strong> このサイトはSSLで保護されています
+        </div>
+
+        {% if error %}
+            <div class="error-message">
+                {{ error|escape }}
+            </div>
+        {% endif %}
+
+        <form method="post" id="loginForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">ユーザー名:</label>
+                <input type="text" id="username" name="username" required maxlength="150" autocomplete="username">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">パスワード:</label>
+                <input type="password" id="password" name="password" required maxlength="128" autocomplete="current-password">
+            </div>
+            
+            <button type="submit" class="btn-login" id="loginBtn">ログイン</button>
+        </form>
+
+        <div class="info-section">
+            <h3>👥 顧客の方へ</h3>
+            <p>予約をご希望のお客様は、各店舗専用のURLからアクセスしてください。</p>
+            {% if tenants %}
+                <p><strong>📍 登録店舗:</strong></p>
+                <div style="max-height: 200px; overflow-y: auto;">
+                    {% for tenant in tenants %}
+                        <a href="{% url 'calendar_by_tenant' tenant.slug %}" class="customer-link" target="_blank" rel="noopener">
+                            {{ tenant.name|escape }}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="color: #6c757d; font-style: italic;">現在、登録されている店舗はありません。</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // フォーム送信時の処理
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const loginBtn = document.getElementById('loginBtn');
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            // 入力値検証
+            if (!username || !password) {
+                e.preventDefault();
+                alert('ユーザー名とパスワードを入力してください。');
+                return;
+            }
+            
+            if (username.length > 150 || password.length > 128) {
+                e.preventDefault();
+                alert('入力値が長すぎます。');
+                return;
+            }
+            
+            // ボタンを無効化してスパム防止
+            loginBtn.disabled = true;
+            loginBtn.textContent = '🔄 ログイン中...';
+            
+            // 5秒後にボタンを再有効化（エラー時のため）
+            setTimeout(() => {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'ログイン';
+            }, 5000);
+        });
+        
+        // エンターキーでログイン
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.ctrlKey && !e.shiftKey) {
+                const activeElement = document.activeElement;
+                if (activeElement.tagName === 'INPUT') {
+                    document.getElementById('loginForm').submit();
+                }
+            }
+        });
+        
+        // セキュリティ: 右クリック無効化（簡易版）
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+        
+        // ページ読み込み時の初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            // フォーカスをユーザー名フィールドに設定
+            document.getElementById('username').focus();
+            
+            // ブラウザの自動補完を有効化
+            document.getElementById('username').setAttribute('autocomplete', 'username');
+            document.getElementById('password').setAttribute('autocomplete', 'current-password');
+            
+            console.log('ログインページが読み込まれました');
+        });
+        
+        // パスワード表示/非表示切り替え（将来の機能拡張用）
+        function togglePasswordVisibility() {
+            const passwordField = document.getElementById('password');
+            const type = passwordField.type === 'password' ? 'text' : 'password';
+            passwordField.type = type;
+        }
+    </script>
+</body>
+</html>

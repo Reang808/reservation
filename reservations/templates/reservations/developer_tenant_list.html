@@ -1,0 +1,224 @@
+<!-- filepath: /Users/pc/Documents/project/LINE/reservations/templates/reservations/developer_tenant_list.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>開発者用テナント一覧 - 予約システム</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background-color: #f8f9fa;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header {
+            background: linear-gradient(135deg, #6f42c1 0%, #6610f2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3);
+        }
+        .tenant-list { 
+            list-style: none; 
+            padding: 0; 
+            margin: 0;
+        }
+        .tenant-item { 
+            background: white;
+            border: 1px solid #dee2e6; 
+            margin: 15px 0; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        .tenant-item:hover { 
+            background-color: #f8f9fa; 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .tenant-name { 
+            font-size: 20px; 
+            font-weight: bold; 
+            color: #495057;
+            margin-bottom: 10px;
+        }
+        .tenant-info {
+            margin-bottom: 15px;
+            color: #6c757d;
+        }
+        .tenant-info div {
+            margin-bottom: 5px;
+        }
+        .tenant-actions { 
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn { 
+            padding: 10px 18px; 
+            text-decoration: none; 
+            border-radius: 6px; 
+            display: inline-block;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+            text-decoration: none;
+        }
+        .btn-primary { 
+            background-color: #007bff; 
+            color: white; 
+        }
+        .btn-primary:hover { 
+            background-color: #0056b3; 
+            color: white;
+        }
+        .btn-secondary { 
+            background-color: #6c757d; 
+            color: white; 
+        }
+        .btn-secondary:hover { 
+            background-color: #545b62; 
+            color: white;
+        }
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+            color: white;
+        }
+        .no-tenants {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 8px;
+            color: #6c757d;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .security-notice {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .back-link {
+            margin-bottom: 20px;
+        }
+        @media (max-width: 768px) {
+            .tenant-actions {
+                flex-direction: column;
+            }
+            .btn {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏪 開発者用テナント一覧</h1>
+            <p>管理したいテナントを選択してください</p>
+        </div>
+
+        <div class="security-notice">
+            <strong>🔒 開発者権限:</strong> 
+            すべてのテナントに管理者権限でアクセスできます。操作は記録されています。
+        </div>
+
+        <div class="back-link">
+            <a href="{% url 'developer_dashboard' %}" class="btn btn-secondary">
+                ← ダッシュボードに戻る
+            </a>
+        </div>
+        
+        <ul class="tenant-list">
+            {% for tenant in tenants %}
+            <li class="tenant-item">
+                <div class="tenant-name">{{ tenant.name|escape }}</div>
+                <div class="tenant-info">
+                    <div>👤 <strong>オーナー:</strong> {{ tenant.owner.username|escape }} ({{ tenant.owner.email|escape }})</div>
+                    <div>🔗 <strong>スラッグ:</strong> {{ tenant.slug|escape }}</div>
+                    <div>📅 <strong>作成日:</strong> {{ tenant.created_at|date:"Y年m月d日 H:i"|default:"不明" }}</div>
+                    <div>🕒 <strong>営業時間:</strong> {{ tenant.start_time|time:"H:i" }} - {{ tenant.end_time|time:"H:i" }}</div>
+                </div>
+                <div class="tenant-actions">
+                    <a href="{% url 'owner_reserve_list_by_tenant' tenant.slug %}" class="btn btn-primary">
+                        📋 予約管理（推奨）
+                    </a>
+                    <a href="{% url 'calendar_by_tenant' tenant.slug %}" class="btn btn-success" target="_blank" rel="noopener">
+                        👁️ 顧客画面
+                    </a>
+                    <a href="{% url 'owner_reserve_calendar' %}?tenant_id={{ tenant.id }}" class="btn btn-secondary">
+                        📅 カレンダー表示
+                    </a>
+                    <a href="{% url 'owner_reserve_list' %}?tenant_id={{ tenant.id }}" class="btn btn-secondary">
+                        📊 予約一覧
+                    </a>
+                    <a href="/admin/reservations/tenant/{{ tenant.id }}/change/" class="btn btn-success" target="_blank" rel="noopener">
+                        ⚙️ 設定変更
+                    </a>
+                </div>
+            </li>
+            {% empty %}
+            <li class="no-tenants">
+                <h3>📭 テナントが登録されていません</h3>
+                <p>まずは管理画面でテナントを作成してください。</p>
+                <a href="/admin/reservations/tenant/add/" class="btn btn-primary" target="_blank" rel="noopener">
+                    ➕ 新しいテナントを作成
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="/admin/" class="btn btn-success" target="_blank" rel="noopener">
+                🔐 Django管理画面
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // セキュリティ: 外部リンククリック時の確認
+        document.querySelectorAll('a[target="_blank"]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const url = this.href;
+                if (url.includes('/admin/') && !confirm('管理画面を開きますか？\n注意: すべての操作は記録されています。')) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        // ページ読み込み時の初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('開発者用テナント一覧が読み込まれました');
+            
+            // テナント数をコンソールに表示
+            const tenantCount = document.querySelectorAll('.tenant-item').length;
+            console.log(`表示中のテナント数: ${tenantCount}`);
+        });
+
+        // キーボードショートカット
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+Dでダッシュボードに戻る
+            if (e.ctrlKey && e.key === 'd') {
+                e.preventDefault();
+                window.location.href = "{% url 'developer_dashboard' %}";
+            }
+        });
+    </script>
+</body>
+</html>
