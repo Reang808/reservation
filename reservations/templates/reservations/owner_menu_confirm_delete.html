@@ -1,171 +1,135 @@
-<!-- filepath: /Users/pc/Documents/project/LINE/reservations/templates/reservations/owner_menu_confirm_delete.html -->
 {% extends 'base.html' %}
-
-{% block title %}メニュー削除確認 - {{ tenant.name|escape }}{% endblock %}
-
-{% block extra_head %}
-<meta name="robots" content="noindex, nofollow">
-<style>
-    .delete-confirmation {
-        max-width: 600px;
-        margin: 40px auto;
-        background: white;
-        padding: 30px;
-        border-radius: 8px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        text-align: center;
-    }
-    .warning-icon {
-        font-size: 80px;
-        color: #dc3545;
-        margin-bottom: 20px;
-    }
-    .menu-info {
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
-        padding: 20px;
-        margin: 20px 0;
-        text-align: left;
-    }
-    .action-buttons {
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        margin-top: 30px;
-    }
-    .btn {
-        padding: 12px 24px;
-        border: none;
-        border-radius: 6px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s;
-    }
-    .btn-danger {
-        background: #dc3545;
-        color: white;
-    }
-    .btn-danger:hover {
-        background: #c82333;
-        transform: translateY(-1px);
-    }
-    .btn-secondary {
-        background: #6c757d;
-        color: white;
-    }
-    .btn-secondary:hover {
-        background: #545b62;
-        color: white;
-        text-decoration: none;
-        transform: translateY(-1px);
-    }
-    .security-warning {
-        background: #fff3cd;
-        border: 1px solid #ffeaa7;
-        color: #856404;
-        padding: 15px;
-        border-radius: 6px;
-        margin-bottom: 20px;
-        font-size: 14px;
-    }
-    @media (max-width: 768px) {
-        .action-buttons {
-            flex-direction: column;
-        }
-        .delete-confirmation {
-            margin: 20px;
-            padding: 20px;
-        }
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="delete-confirmation">
-    <div class="warning-icon">⚠️</div>
-    
-    <h2>メニュー削除確認</h2>
-    
-    <div class="security-warning">
-        <strong>🔒 重要:</strong> この操作は取り消すことができません。メニューに関連する予約データも影響を受ける可能性があります。
-    </div>
-    
-    <p style="font-size: 18px; color: #495057;">
-        本当に以下のメニューを削除しますか？
-    </p>
-    
-    <div class="menu-info">
-        <h4>📋 削除対象メニュー</h4>
-        <p><strong>🏪 店舗名:</strong> {{ tenant.name|escape }}</p>
-        <p><strong>🍽️ メニュー名:</strong> {{ menu.name|escape }}</p>
-        {% if menu.description %}
-            <p><strong>📝 説明:</strong> {{ menu.description|escape }}</p>
-        {% endif %}
-        {% if menu.price %}
-            <p><strong>💰 価格:</strong> ¥{{ menu.price|floatformat:0 }}</p>
-        {% endif %}
-        <p><strong>📅 作成日:</strong> {{ menu.created_at|date:"Y年m月d日 H:i"|default:"不明" }}</p>
-    </div>
-    
-    <form method="post" id="deleteForm">
-        {% csrf_token %}
-        <div class="action-buttons">
-            <a href="{% url 'owner_menu_list_by_tenant' tenant.slug %}" class="btn btn-secondary">
-                ← キャンセル
-            </a>
-            <button type="submit" class="btn btn-danger" id="deleteBtn">
-                🗑️ 削除する
-            </button>
+<div class="container delete-container">
+    <div class="card delete-card">
+        <div class="warning-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.14-2.043-2.282a45.655 45.655 0 00-6.101 0c-1.133.142-2.043 1.09-2.043 2.282v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+            </svg>
         </div>
-    </form>
+        <h2 class="delete-title">{{ tenant.name }} メニュー削除確認</h2>
+        <p class="warning-message">
+            本当に「<span class="highlight">{{ menu.name|escape }}</span>」を削除しますか？<br>
+            この操作は元に戻せません。
+        </p>
+        <form method="post" class="styled-form">
+            {% csrf_token %}
+            <div class="form-actions">
+                <button type="submit" class="btn btn-danger">削除する</button>
+                <a href="{% url 'owner_menu_list' %}" class="btn btn-secondary">キャンセル</a>
+            </div>
+        </form>
+    </div>
 </div>
 
-<script>
-// 削除確認ダイアログ
-document.getElementById('deleteForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const menuName = "{{ menu.name|escape|escapejs }}";
-    const confirmMessage = `本当に「${menuName}」を削除しますか？\n\nこの操作は取り消すことができません。`;
-    
-    if (confirm(confirmMessage)) {
-        // ボタンを無効化してスパム防止
-        const deleteBtn = document.getElementById('deleteBtn');
-        deleteBtn.disabled = true;
-        deleteBtn.textContent = '🔄 削除中...';
-        
-        // フォームを送信
-        this.submit();
-    }
-});
+<style>
+/* 全体のスタイル */
+body {
+    background-color: #F0F4F8;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
 
-// ESCキーでキャンセル
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        const cancelUrl = "{% url 'owner_menu_list_by_tenant' tenant.slug %}";
-        if (confirm('削除をキャンセルしてメニュー一覧に戻りますか？')) {
-            window.location.href = cancelUrl;
-        }
-    }
-});
+.delete-container {
+    max-width: 450px;
+    width: 90%;
+}
 
-// ページ読み込み時の初期化
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('メニュー削除確認ページが読み込まれました');
-    
-    // セキュリティ警告を5秒後に強調表示
-    setTimeout(() => {
-        const warning = document.querySelector('.security-warning');
-        if (warning) {
-            warning.style.background = '#f8d7da';
-            warning.style.borderColor = '#f5c6cb';
-            warning.style.color = '#721c24';
-        }
-    }, 5000);
-});
-</script>
+.card {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.warning-icon {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 20px auto;
+    color: #E55C5C;
+}
+
+.delete-title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.warning-message {
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.highlight {
+    font-weight: bold;
+    color: #E55C5C;
+}
+
+/* ボタンのスタイル */
+.btn {
+    display: block;
+    width: 100%;
+    max-width: 320px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+}
+
+.btn-danger {
+    background-color: #E55C5C;
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background-color: #C94C4C;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: #E0E0E0;
+    color: #555;
+}
+
+.btn-secondary:hover {
+    background-color: #D3D3D3;
+}
+
+.form-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 480px) {
+    .card {
+        padding: 20px;
+    }
+    .delete-title {
+        font-size: 1.4rem;
+    }
+    .warning-message {
+        font-size: 0.95rem;
+    }
+    .btn {
+        padding: 10px;
+        font-size: 0.95rem;
+    }
+}
+</style>
 {% endblock %}

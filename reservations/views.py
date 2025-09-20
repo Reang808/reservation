@@ -1,3 +1,19 @@
+from django.conf import settings
+from twilio.rest import Client
+# TwilioでSMS送信
+def send_sms(to_number, message):
+    account_sid = settings.TWILIO_ACCOUNT_SID
+    auth_token = settings.TWILIO_AUTH_TOKEN
+    from_number = settings.TWILIO_FROM_NUMBER
+    client = Client(account_sid, auth_token)
+    try:
+        client.messages.create(
+            body=message,
+            from_=from_number,
+            to=to_number
+        )
+    except Exception as e:
+        print(f"SMS送信エラー: {e}")
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
@@ -106,9 +122,10 @@ def reserve_slot(request, tenant_slug=None):
     time_str = request.POST.get('time_slot', '').strip()
     menu_id = request.POST.get('menu_id', '').strip()
     customer_name = request.POST.get('customer_name', '').strip()
+    customer_phone = request.POST.get('customer_phone', '').strip()
     
     # バリデーション
-    if not all([date_str, time_str, customer_name]):
+    if not all([date_str, time_str, customer_name, customer_phone]):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return HttpResponse('必須項目が不足しています', status=400)
         return redirect('calendar_by_tenant', tenant_slug=tenant_slug)
@@ -130,13 +147,22 @@ def reserve_slot(request, tenant_slug=None):
         # 重複チェック
         if not Reservation.objects.filter(tenant=tenant, date=reserve_date, time_slot=reserve_time).exists():
             menu = Menu.objects.filter(id=menu_id, tenant=tenant).first() if menu_id else None
-            Reservation.objects.create(
+            reservation = Reservation.objects.create(
                 tenant=tenant,
                 menu=menu,
                 customer_name=customer_name[:100],  # 長さ制限
+                customer_phone=customer_phone[:20],
                 date=reserve_date,
                 time_slot=reserve_time
             )
+            # 顧客へSMS通知
+            sms_msg = f"{tenant.name}のご予約が完了しました。\n日時: {reserve_date} {reserve_time.strftime('%H:%M')}\nお名前: {customer_name}"
+            send_sms(customer_phone, sms_msg)
+            # 事業者へSMS通知（オーナーの電話番号があれば）
+            owner_phone = getattr(tenant.owner, 'phone', None)
+            if owner_phone:
+                owner_msg = f"新しい予約が入りました。\n日時: {reserve_date} {reserve_time.strftime('%H:%M')}\n顧客: {customer_name}"
+                send_sms(owner_phone, owner_msg)
         else:
             raise ValueError("この時間は既に予約済みです")
         

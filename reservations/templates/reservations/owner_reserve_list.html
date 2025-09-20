@@ -1,171 +1,424 @@
-<!-- filepath: /Users/pc/Documents/project/LINE/reservations/templates/reservations/owner_menu_confirm_delete.html -->
 {% extends 'base.html' %}
-
-{% block title %}メニュー削除確認 - {{ tenant.name|escape }}{% endblock %}
-
-{% block extra_head %}
-<meta name="robots" content="noindex, nofollow">
+{% block content %}
 <style>
-    .delete-confirmation {
-        max-width: 600px;
-        margin: 40px auto;
-        background: white;
-        padding: 30px;
-        border-radius: 8px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        text-align: center;
+/* 全体のスタイル */
+body {
+    background-color: #F0F4F8; /* 落ち着いた背景色 */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    color: #333;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 32px auto;
+    padding: 0 15px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.header h1 {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.main-content {
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.card {
+    flex: 1 1 450px;
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05); /* 柔らかいシャドウ */
+}
+
+.card h2 {
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #EEE;
+    padding-bottom: 10px;
+}
+
+/* ボタンのスタイル */
+.btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+}
+
+.btn-primary {
+    background-color: #8E7CC3; /* メインカラー */
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #7A69A9;
+    transform: translateY(-2px);
+}
+
+.btn-success {
+    background-color: #4AD295;
+    color: #fff;
+}
+
+.btn-success:hover {
+    background-color: #36B880;
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background-color: #FF6B6B;
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background-color: #E65A5A;
+}
+
+.btn-secondary {
+    background-color: #E0E0E0;
+    color: #555;
+}
+
+.btn-secondary:hover {
+    background-color: #D3D3D3;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.9em;
+}
+
+/* テーブルのスタイル */
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px; /* PCでの表示を考慮 */
+}
+
+th, td {
+    padding: 12px 10px;
+    text-align: left;
+    border-bottom: 1px solid #E0E0E0;
+}
+
+th {
+    background-color: #F8F9FA;
+    font-weight: 600;
+    color: #555;
+    white-space: nowrap;
+}
+
+.calendar-cell {
+    text-align: center;
+    background-color: #FDFDFD;
+    transition: background-color 0.2s ease;
+}
+
+.calendar-cell:hover {
+    background-color: #F0F4F8; /* ホバー効果 */
+}
+
+.reserved {
+    background-color: #FFEBEE; /* 予約済みの背景色 */
+    border-radius: 6px;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.customer-name {
+    font-weight: 600;
+}
+
+.no-data {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 20px;
+}
+
+/* モーダル */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal.is-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 25px 30px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    width: 90%;
+    max-width: 400px;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+}
+
+.modal.is-visible .modal-content {
+    transform: translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h3 {
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.modal-date-time {
+    font-weight: 600;
+    color: #888;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #DDD;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 1.5rem;
     }
-    .warning-icon {
-        font-size: 80px;
-        color: #dc3545;
-        margin-bottom: 20px;
+    .main-content {
+        flex-direction: column;
     }
-    .menu-info {
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
-        padding: 20px;
-        margin: 20px 0;
-        text-align: left;
-    }
-    .action-buttons {
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        margin-top: 30px;
-    }
-    .btn {
-        padding: 12px 24px;
-        border: none;
-        border-radius: 6px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s;
-    }
-    .btn-danger {
-        background: #dc3545;
-        color: white;
-    }
-    .btn-danger:hover {
-        background: #c82333;
-        transform: translateY(-1px);
-    }
-    .btn-secondary {
-        background: #6c757d;
-        color: white;
-    }
-    .btn-secondary:hover {
-        background: #545b62;
-        color: white;
-        text-decoration: none;
-        transform: translateY(-1px);
-    }
-    .security-warning {
-        background: #fff3cd;
-        border: 1px solid #ffeaa7;
-        color: #856404;
+    .card {
         padding: 15px;
-        border-radius: 6px;
-        margin-bottom: 20px;
+        flex-basis: auto;
+    }
+    .card h2 {
+        font-size: 1.2rem;
+    }
+    table {
+        min-width: 100%;
         font-size: 14px;
     }
-    @media (max-width: 768px) {
-        .action-buttons {
-            flex-direction: column;
-        }
-        .delete-confirmation {
-            margin: 20px;
-            padding: 20px;
-        }
+    th, td {
+        padding: 8px 6px;
     }
+    .btn {
+        font-size: 0.9em;
+        padding: 8px 15px;
+    }
+    /* iPhone SEなどの小型デバイス向け (480px以下) */
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 1.3rem;
+    }
+    .button-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .btn {
+        width: 100%; /* ボタンを全幅表示に */
+        min-width: unset;
+        font-size: 0.9em;
+        padding: 10px 0;
+    }
+    .card {
+        padding: 10px;
+    }
+    .calendar-cell {
+        padding: 6px 4px; /* セルのパディングをさらに縮小 */
+    }
+    .reserved {
+        font-size: 0.8em; /* 予約済みテキストを小さく */
+        padding: 3px;
+    }
+    .btn-sm {
+        padding: 4px 8px; /* 小さなボタンのサイズ調整 */
+    }
+    .modal-content {
+        padding: 20px;
+    }
+}
 </style>
-{% endblock %}
-
-{% block content %}
-<div class="delete-confirmation">
-    <div class="warning-icon">⚠️</div>
-    
-    <h2>メニュー削除確認</h2>
-    
-    <div class="security-warning">
-        <strong>🔒 重要:</strong> この操作は取り消すことができません。メニューに関連する予約データも影響を受ける可能性があります。
-    </div>
-    
-    <p style="font-size: 18px; color: #495057;">
-        本当に以下のメニューを削除しますか？
-    </p>
-    
-    <div class="menu-info">
-        <h4>📋 削除対象メニュー</h4>
-        <p><strong>🏪 店舗名:</strong> {{ tenant.name|escape }}</p>
-        <p><strong>🍽️ メニュー名:</strong> {{ menu.name|escape }}</p>
-        {% if menu.description %}
-            <p><strong>📝 説明:</strong> {{ menu.description|escape }}</p>
-        {% endif %}
-        {% if menu.price %}
-            <p><strong>💰 価格:</strong> ¥{{ menu.price|floatformat:0 }}</p>
-        {% endif %}
-        <p><strong>📅 作成日:</strong> {{ menu.created_at|date:"Y年m月d日 H:i"|default:"不明" }}</p>
-    </div>
-    
-    <form method="post" id="deleteForm">
-        {% csrf_token %}
-        <div class="action-buttons">
-            <a href="{% url 'owner_menu_list_by_tenant' tenant.slug %}" class="btn btn-secondary">
-                ← キャンセル
-            </a>
-            <button type="submit" class="btn btn-danger" id="deleteBtn">
-                🗑️ 削除する
-            </button>
+<div class="container">
+    <div class="header">
+        <h1>{{ tenant.name }} 予約管理</h1>
+        <div class="button-group">
+            <a href="{% url 'owner_menu_list_by_tenant' tenant.slug %}" class="btn btn-primary">メニュー管理</a>
+            <a href="{% url 'owner_reserve_list_by_tenant' tenant.slug %}" class="btn btn-primary">予約カレンダー</a>
         </div>
-    </form>
+    </div>
+    <div class="main-content">
+        <div class="card calendar-card">
+            <h2>カレンダー</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>時間＼日付</th>
+                            {% for day in week_days %}
+                            <th>{{ day|date:'m/d' }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in calendar_rows %}
+                        <tr>
+                            <td>{{ row.0.slot|time:'H:i' }}</td>
+                            {% for cell in row %}
+                            <td class="calendar-cell">
+                                {% if cell.reservation %}
+                                <div class="reserved">
+                                    <span class="customer-name">{{ cell.reservation.customer_name|escape }}</span>
+                                    <form method="post" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="reserve_id" value="{{ cell.reservation.id }}">
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('本当に削除しますか？');">削除</button>
+                                    </form>
+                                </div>
+                                {% else %}
+                                <button class="btn btn-success btn-sm" onclick="showAddForm('{{ cell.day|date:'Y-m-d' }}','{{ cell.slot|time:'H:i' }}')">＋</button>
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card list-card">
+            <h2>予約一覧</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>日付</th>
+                            <th>時間</th>
+                            <th>メニュー</th>
+                            <th>顧客名</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in reservations %}
+                        <tr>
+                            <td>{{ r.date }}</td>
+                            <td>{{ r.time_slot }}</td>
+                            <td>{% if r.menu %}{{ r.menu.name|escape }}{% endif %}</td>
+                            <td>{{ r.customer_name|escape }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="no-data">予約はありません</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="add-form-modal" class="modal">
+    <div class="modal-content">
+        <form method="post" id="add-reserve-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add">
+            <input type="hidden" name="date" id="add-date">
+            <input type="hidden" name="time_slot" id="add-time-slot">
+            <div class="modal-header">
+                <h3>予約追加</h3>
+                <span class="modal-date-time"><b id="add-date-label"></b> <b id="add-time-label"></b></span>
+            </div>
+            <div class="form-group">
+                <label for="menu">メニュー:</label>
+                <select id="menu" name="menu_id">
+                    {% for m in menus %}<option value="{{ m.id }}">{{ m.name }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="customer_name">顧客名:</label>
+                <input type="text" id="customer_name" name="customer_name" required>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">予約追加</button>
+                <button type="button" class="btn btn-secondary" onclick="hideAddForm()">キャンセル</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script>
-// 削除確認ダイアログ
-document.getElementById('deleteForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const menuName = "{{ menu.name|escape|escapejs }}";
-    const confirmMessage = `本当に「${menuName}」を削除しますか？\n\nこの操作は取り消すことができません。`;
-    
-    if (confirm(confirmMessage)) {
-        // ボタンを無効化してスパム防止
-        const deleteBtn = document.getElementById('deleteBtn');
-        deleteBtn.disabled = true;
-        deleteBtn.textContent = '🔄 削除中...';
-        
-        // フォームを送信
-        this.submit();
+    function showAddForm(date, time) {
+        document.getElementById('add-date').value = date;
+        document.getElementById('add-time-slot').value = time;
+        document.getElementById('add-date-label').innerText = date;
+        document.getElementById('add-time-label').innerText = time;
+        document.getElementById('add-form-modal').classList.add('is-visible');
     }
-});
-
-// ESCキーでキャンセル
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        const cancelUrl = "{% url 'owner_menu_list_by_tenant' tenant.slug %}";
-        if (confirm('削除をキャンセルしてメニュー一覧に戻りますか？')) {
-            window.location.href = cancelUrl;
-        }
+    function hideAddForm() {
+        document.getElementById('add-form-modal').classList.remove('is-visible');
     }
-});
-
-// ページ読み込み時の初期化
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('メニュー削除確認ページが読み込まれました');
-    
-    // セキュリティ警告を5秒後に強調表示
-    setTimeout(() => {
-        const warning = document.querySelector('.security-warning');
-        if (warning) {
-            warning.style.background = '#f8d7da';
-            warning.style.borderColor = '#f5c6cb';
-            warning.style.color = '#721c24';
-        }
-    }, 5000);
-});
 </script>
 {% endblock %}

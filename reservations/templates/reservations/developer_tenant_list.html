@@ -1,4 +1,3 @@
-<!-- filepath: /Users/pc/Documents/project/LINE/reservations/templates/reservations/developer_tenant_list.html -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -6,140 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>開発者用テナント一覧 - 予約システム</title>
-    <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            margin: 0; 
-            padding: 20px; 
-            background-color: #f8f9fa;
-        }
-        .container { max-width: 1000px; margin: 0 auto; }
-        .header {
-            background: linear-gradient(135deg, #6f42c1 0%, #6610f2 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3);
-        }
-        .tenant-list { 
-            list-style: none; 
-            padding: 0; 
-            margin: 0;
-        }
-        .tenant-item { 
-            background: white;
-            border: 1px solid #dee2e6; 
-            margin: 15px 0; 
-            padding: 20px; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: all 0.3s;
-        }
-        .tenant-item:hover { 
-            background-color: #f8f9fa; 
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        .tenant-name { 
-            font-size: 20px; 
-            font-weight: bold; 
-            color: #495057;
-            margin-bottom: 10px;
-        }
-        .tenant-info {
-            margin-bottom: 15px;
-            color: #6c757d;
-        }
-        .tenant-info div {
-            margin-bottom: 5px;
-        }
-        .tenant-actions { 
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .btn { 
-            padding: 10px 18px; 
-            text-decoration: none; 
-            border-radius: 6px; 
-            display: inline-block;
-            font-weight: 500;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-        }
-        .btn:hover {
-            transform: translateY(-1px);
-            text-decoration: none;
-        }
-        .btn-primary { 
-            background-color: #007bff; 
-            color: white; 
-        }
-        .btn-primary:hover { 
-            background-color: #0056b3; 
-            color: white;
-        }
-        .btn-secondary { 
-            background-color: #6c757d; 
-            color: white; 
-        }
-        .btn-secondary:hover { 
-            background-color: #545b62; 
-            color: white;
-        }
-        .btn-success {
-            background-color: #28a745;
-            color: white;
-        }
-        .btn-success:hover {
-            background-color: #218838;
-            color: white;
-        }
-        .no-tenants {
-            text-align: center;
-            padding: 60px 20px;
-            background: white;
-            border-radius: 8px;
-            color: #6c757d;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .security-notice {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        .back-link {
-            margin-bottom: 20px;
-        }
-        @media (max-width: 768px) {
-            .tenant-actions {
-                flex-direction: column;
-            }
-            .btn {
-                text-align: center;
-            }
-        }
-    </style>
 </head>
 <body>
-    <div class="container">
+    <div class="main-container">
         <div class="header">
-            <h1>🏪 開発者用テナント一覧</h1>
+            <h1>開発者用テナント一覧</h1>
             <p>管理したいテナントを選択してください</p>
         </div>
 
-        <div class="security-notice">
-            <strong>🔒 開発者権限:</strong> 
-            すべてのテナントに管理者権限でアクセスできます。操作は記録されています。
+        <div class="info-notice">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+            </svg>
+            <p><strong>開発者権限:</strong> すべてのテナントに管理者権限でアクセスできます。操作は記録されています。</p>
         </div>
 
-        <div class="back-link">
+        <div class="back-link-container">
             <a href="{% url 'developer_dashboard' %}" class="btn btn-secondary">
                 ← ダッシュボードに戻る
             </a>
@@ -148,28 +29,57 @@
         <ul class="tenant-list">
             {% for tenant in tenants %}
             <li class="tenant-item">
-                <div class="tenant-name">{{ tenant.name|escape }}</div>
+                <div class="tenant-header">
+                    <h3 class="tenant-name">{{ tenant.name|escape }}</h3>
+                </div>
                 <div class="tenant-info">
-                    <div>👤 <strong>オーナー:</strong> {{ tenant.owner.username|escape }} ({{ tenant.owner.email|escape }})</div>
-                    <div>🔗 <strong>スラッグ:</strong> {{ tenant.slug|escape }}</div>
-                    <div>📅 <strong>作成日:</strong> {{ tenant.created_at|date:"Y年m月d日 H:i"|default:"不明" }}</div>
-                    <div>🕒 <strong>営業時間:</strong> {{ tenant.start_time|time:"H:i" }} - {{ tenant.end_time|time:"H:i" }}</div>
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                        </svg>
+                        <span><strong>オーナー:</strong> {{ tenant.owner.username|escape }} ({{ tenant.owner.email|escape }})</span>
+                    </div>
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                        </svg>
+                        <span><strong>スラッグ:</strong> {{ tenant.slug|escape }}</span>
+                    </div>
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                        </svg>
+                        <span><strong>作成日:</strong> {{ tenant.created_at|date:"Y年m月d日 H:i"|default:"不明" }}</span>
+                    </div>
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span><strong>営業時間:</strong> {{ tenant.start_time|time:"H:i" }} - {{ tenant.end_time|time:"H:i" }}</span>
+                    </div>
                 </div>
                 <div class="tenant-actions">
-                    <a href="{% url 'owner_reserve_list_by_tenant' tenant.slug %}" class="btn btn-primary">
-                        📋 予約管理（推奨）
+                    <a href="{% url 'owner_reserve_list_by_tenant' tenant.slug %}" class="btn btn-action btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m.75 12l2.25 2.25 3-3m-6.829 4.382a2.25 2.25 0 01-2.09-2.09l-.75-3.75A1.125 1.125 0 011.5 12v-.75m7.5-6v.75m0-3h-3a1.125 1.125 0 00-1.125 1.125v1.5a3.375 3.375 0 003.375 3.375h1.5A1.125 1.125 0 0118 7.5v.75m-5.25 6h4.5" />
+                        </svg>
+                        <span>予約管理（推奨）</span>
                     </a>
-                    <a href="{% url 'calendar_by_tenant' tenant.slug %}" class="btn btn-success" target="_blank" rel="noopener">
-                        👁️ 顧客画面
+                    <a href="{% url 'calendar_by_tenant' tenant.slug %}" class="btn btn-action btn-secondary" target="_blank" rel="noopener">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.575 3.01 9.963 7.823.08.384.08.637 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.575-3.01-9.963-7.823z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span>顧客画面</span>
                     </a>
-                    <a href="{% url 'owner_reserve_calendar' %}?tenant_id={{ tenant.id }}" class="btn btn-secondary">
-                        📅 カレンダー表示
-                    </a>
-                    <a href="{% url 'owner_reserve_list' %}?tenant_id={{ tenant.id }}" class="btn btn-secondary">
-                        📊 予約一覧
-                    </a>
-                    <a href="/admin/reservations/tenant/{{ tenant.id }}/change/" class="btn btn-success" target="_blank" rel="noopener">
-                        ⚙️ 設定変更
+                    <a href="/admin/reservations/tenant/{{ tenant.id }}/change/" class="btn btn-action btn-success" target="_blank" rel="noopener">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.75c.504-.253 1.06-.395 1.626-.453a4.875 4.875 0 013.298 0c.566.058 1.122.2 1.626.453M12 18.75a3.75 3.75 0 100-7.5 3.75 3.75 0 000 7.5zM12 12m-2.25 0a2.25 2.25 0 114.5 0 2.25 2.25 0 01-4.5 0zM12 12m-2.25 0a2.25 2.25 0 114.5 0 2.25 2.25 0 01-4.5 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a5.25 5.25 0 00-5.25 5.25v.75m10.5 0v-.75c0-2.9-2.35-5.25-5.25-5.25z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a5.25 5.25 0 00-5.25 5.25v.75M12 12m-2.25 0a2.25 2.25 0 114.5 0 2.25 2.25 0 01-4.5 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a5.25 5.25 0 00-5.25 5.25v.75" />
+                        </svg>
+                        <span>設定変更</span>
                     </a>
                 </div>
             </li>
@@ -178,21 +88,241 @@
                 <h3>📭 テナントが登録されていません</h3>
                 <p>まずは管理画面でテナントを作成してください。</p>
                 <a href="/admin/reservations/tenant/add/" class="btn btn-primary" target="_blank" rel="noopener">
-                    ➕ 新しいテナントを作成
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    <span>新しいテナントを作成</span>
                 </a>
             </li>
             {% endfor %}
         </ul>
 
-        <div style="text-align: center; margin-top: 30px;">
-            <a href="/admin/" class="btn btn-success" target="_blank" rel="noopener">
+        <div class="footer-link">
+            <a href="/admin/" class="btn btn-secondary" target="_blank" rel="noopener">
                 🔐 Django管理画面
             </a>
         </div>
     </div>
 
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background-color: #f0f4f8;
+            color: #333;
+        }
+
+        .main-container { 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            padding: 0 15px;
+        }
+
+        .header {
+            background-color: #8E7CC3;
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(142, 124, 195, 0.3);
+            background: linear-gradient(135deg, #8E7CC3 0%, #6A5B9C 100%);
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            margin: 0;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        /* お知らせ・セキュリティ通知 */
+        .info-notice {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border-left: 5px solid #8E7CC3;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        
+        .info-notice svg {
+            width: 24px;
+            height: 24px;
+            color: #8E7CC3;
+        }
+
+        .info-notice p {
+            margin: 0;
+            font-size: 0.95em;
+            color: #555;
+        }
+
+        /* 戻るリンク */
+        .back-link-container {
+            margin-bottom: 25px;
+        }
+
+        /* テナントリスト */
+        .tenant-list { 
+            list-style: none; 
+            padding: 0; 
+            margin: 0;
+        }
+
+        .tenant-item { 
+            background: white;
+            border: 1px solid #dee2e6; 
+            margin: 15px 0; 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .tenant-item:hover { 
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .tenant-header {
+            border-bottom: 1px solid #EEE;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .tenant-name { 
+            font-size: 1.5rem; 
+            font-weight: 700; 
+            color: #495057;
+            margin: 0;
+        }
+
+        .tenant-info {
+            margin-bottom: 20px;
+            color: #6c757d;
+        }
+
+        .tenant-info div {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+
+        .tenant-info svg {
+            width: 20px;
+            height: 20px;
+            color: #8E7CC3;
+        }
+
+        .tenant-actions { 
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn { 
+            padding: 12px 20px; 
+            text-decoration: none; 
+            border-radius: 8px; 
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            flex-grow: 1;
+            justify-content: center;
+        }
+
+        .btn-primary { 
+            background-color: #8E7CC3; 
+            color: white; 
+        }
+
+        .btn-primary:hover { 
+            background-color: #7A69A9; 
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary { 
+            background-color: #E0E0E0; 
+            color: #555;
+        }
+
+        .btn-secondary:hover { 
+            background-color: #D3D3D3; 
+        }
+        
+        .btn-success {
+            background-color: #4AD295;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #36B880;
+            transform: translateY(-2px);
+        }
+
+        .no-tenants {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+            color: #6c757d;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        
+        .no-tenants h3 {
+            font-size: 1.5rem;
+            color: #555;
+        }
+        
+        .no-tenants p {
+            margin-bottom: 20px;
+        }
+
+        .footer-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        /* レスポンシブ対応 */
+        @media (max-width: 768px) {
+            .tenant-actions {
+                flex-direction: column;
+            }
+            .btn-action {
+                width: 100%;
+            }
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            .tenant-item {
+                padding: 15px;
+            }
+            .tenant-name {
+                font-size: 1.3rem;
+            }
+            .tenant-info div {
+                font-size: 0.9em;
+                margin-bottom: 8px;
+            }
+        }
+    </style>
+
     <script>
-        // セキュリティ: 外部リンククリック時の確認
         document.querySelectorAll('a[target="_blank"]').forEach(link => {
             link.addEventListener('click', function(e) {
                 const url = this.href;
@@ -202,18 +332,14 @@
             });
         });
 
-        // ページ読み込み時の初期化
         document.addEventListener('DOMContentLoaded', function() {
             console.log('開発者用テナント一覧が読み込まれました');
             
-            // テナント数をコンソールに表示
             const tenantCount = document.querySelectorAll('.tenant-item').length;
             console.log(`表示中のテナント数: ${tenantCount}`);
         });
 
-        // キーボードショートカット
         document.addEventListener('keydown', function(e) {
-            // Ctrl+Dでダッシュボードに戻る
             if (e.ctrlKey && e.key === 'd') {
                 e.preventDefault();
                 window.location.href = "{% url 'developer_dashboard' %}";

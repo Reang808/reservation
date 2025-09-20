@@ -1,4 +1,3 @@
-<!-- filepath: /Users/pc/Documents/project/LINE/reservations/templates/base.html -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -7,135 +6,199 @@
     <meta name="robots" content="{% block robots %}noindex, nofollow{% endblock %}">
     <meta name="description" content="{% block description %}予約システム管理ページ{% endblock %}">
     <title>{% block title %}管理ページ - 予約システム{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <!-- セキュリティヘッダー -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     
     <style>
         :root {
-            --primary-color: #007bff;
-            --secondary-color: #6c757d;
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
-            --light-color: #f8f9fa;
-            --dark-color: #343a40;
+            /* 主要カラーパレット */
+            --color-primary: #8E7CC3;      /* パープル */
+            --color-secondary: #E0E0E0;    /* ライトグレー */
+            --color-success: #4AD295;      /* グリーン */
+            --color-danger: #E55C5C;       /* 赤 */
+            --color-warning: #FFC107;      /* 黄色 */
+            --color-info: #5BC0DE;         /* 水色 */
+
+            /* グレースケール */
+            --color-black: #333333;
+            --color-dark-gray: #555555;
+            --color-medium-gray: #888888;
+            --color-light-gray: #F0F4F8;
+            --color-white: #FFFFFF;
+
+            /* シャドウ */
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
         
+        /* 全体スタイル */
         * {
             box-sizing: border-box;
         }
         
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: 'Noto Sans JP', sans-serif; 
             margin: 0; 
-            padding: 20px;
-            background-color: var(--light-color);
-            color: var(--dark-color);
-            line-height: 1.6;
+            padding: 0;
+            background-color: var(--color-light-gray);
+            color: var(--color-black);
+            line-height: 1.7;
         }
         
-        .container {
+        /* メインコンテナ */
+        .main-container {
             max-width: 1200px;
             margin: 0 auto;
-            background: white;
+            padding: 20px;
+        }
+
+        /* カードコンポーネント */
+        .card {
+            background: var(--color-white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
             padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* ヘッダー */
+        .header-nav {
+            background: linear-gradient(135deg, var(--color-primary) 0%, #6A5B9C 100%);
+            color: var(--color-white);
+            padding: 40px 20px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header-nav h1 {
+            color: var(--color-white);
+            font-size: 2rem;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .header-nav p {
+            margin: 5px 0 0;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.85);
         }
         
+        /* 見出し */
         h1, h2, h3, h4, h5, h6 {
-            color: var(--dark-color);
+            color: var(--color-black);
             margin-top: 0;
         }
         
+        /* ボタン */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        .btn-primary { background: var(--color-primary); color: white; }
+        .btn-primary:hover { background: #7A69A9; transform: translateY(-2px); }
+        
+        .btn-secondary { background: var(--color-secondary); color: var(--color-dark-gray); }
+        .btn-secondary:hover { background: #D3D3D3; transform: translateY(-2px); }
+        
+        .btn-success { background: var(--color-success); color: white; }
+        .btn-success:hover { background: #36B880; transform: translateY(-2px); }
+        
+        .btn-danger { background: var(--color-danger); color: white; }
+        .btn-danger:hover { background: #CC4A4A; transform: translateY(-2px); }
+        
+        /* テーブル */
+        .table-container {
+            overflow-x: auto;
+        }
+
         table { 
             border-collapse: collapse; 
             width: 100%;
-            margin: 20px 0;
-            border-radius: 8px;
+            min-width: 600px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-sm);
+            margin: 0;
         }
         
         th, td { 
-            padding: 12px 16px; 
-            border: 1px solid #dee2e6; 
+            padding: 15px; 
+            border-bottom: 1px solid #E0E0E0; 
             text-align: left;
         }
         
         th { 
-            background: var(--dark-color);
-            color: white;
+            background: var(--color-light-gray);
+            color: var(--color-dark-gray);
             font-weight: 600;
         }
         
-        tr:nth-child(even) {
-            background-color: #f8f9fa;
+        tr:last-child td {
+            border-bottom: none;
         }
         
         tr:hover {
-            background-color: #e9ecef;
+            background-color: #FAFAFA;
         }
         
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin: 5px;
-        }
-        
-        .btn-primary { background: var(--primary-color); color: white; }
-        .btn-primary:hover { background: #0056b3; transform: translateY(-1px); }
-        
-        .btn-secondary { background: var(--secondary-color); color: white; }
-        .btn-secondary:hover { background: #545b62; transform: translateY(-1px); }
-        
-        .btn-success { background: var(--success-color); color: white; }
-        .btn-success:hover { background: #218838; transform: translateY(-1px); }
-        
-        .btn-danger { background: var(--danger-color); color: white; }
-        .btn-danger:hover { background: #c82333; transform: translateY(-1px); }
-        
+        /* アラートメッセージ */
         .alert {
             padding: 15px;
             margin-bottom: 20px;
-            border-radius: 6px;
-            border: 1px solid transparent;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-        
+
+        .alert p {
+            margin: 0;
+        }
+
         .alert-success {
-            color: #155724;
-            background-color: #d4edda;
-            border-color: #c3e6cb;
+            color: #1a6031;
+            background-color: #e6f6ec;
         }
         
         .alert-error, .alert-danger {
-            color: #721c24;
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
+            color: #8b343c;
+            background-color: #fcebeb;
         }
         
         .alert-warning {
-            color: #856404;
-            background-color: #fff3cd;
-            border-color: #ffeaa7;
+            color: #92753a;
+            background-color: #fff9e6;
         }
         
         .alert-info {
-            color: #0c5460;
-            background-color: #d1ecf1;
-            border-color: #bee5eb;
+            color: #3b7484;
+            background-color: #e8f7fa;
+        }
+
+        .alert svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
         }
         
+        /* フォーム */
         .form-group {
             margin-bottom: 20px;
         }
@@ -143,60 +206,58 @@
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--dark-color);
+            font-weight: 500;
+            color: var(--color-dark-gray);
         }
         
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
+        .form-input, .form-select, .form-textarea {
             width: 100%;
             padding: 12px;
-            border: 2px solid #dee2e6;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: border-color 0.3s;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: #FAFAFA;
+            transition: all 0.3s ease;
         }
         
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-        }
-        
-        .header-nav {
-            background: var(--dark-color);
-            color: white;
-            padding: 15px 0;
-            margin: -30px -30px 30px -30px;
-            border-radius: 8px 8px 0 0;
-        }
-        
-        .header-nav .container {
-            background: none;
-            box-shadow: none;
-            padding: 0 30px;
-            margin: 0;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 2px rgba(142, 124, 195, 0.2);
         }
         
         .breadcrumb {
-            background: var(--light-color);
-            padding: 10px 15px;
-            border-radius: 6px;
+            background: var(--color-white);
+            padding: 15px 20px;
+            border-radius: 8px;
             margin-bottom: 20px;
-            font-size: 14px;
-            color: var(--secondary-color);
+            font-size: 0.9rem;
+            color: var(--color-medium-gray);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .breadcrumb a {
+            color: var(--color-dark-gray);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--color-primary);
         }
         
+        /* レスポンシブ対応 */
         @media (max-width: 768px) {
-            body {
+            .main-container {
                 padding: 10px;
             }
             
-            .container {
+            .card {
                 padding: 20px;
+            }
+            
+            .header-nav {
+                padding: 30px 15px;
             }
             
             table {
@@ -204,7 +265,7 @@
             }
             
             th, td {
-                padding: 8px;
+                padding: 10px;
             }
         }
     </style>
@@ -212,49 +273,62 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <div class="container">
-        {% if not hide_header %}
-        <div class="header-nav">
-            <div class="container">
-                <h1>{% block header %}🏪 テナント管理ページ{% endblock %}</h1>
-                {% if user.is_authenticated %}
-                    <p>ようこそ、{{ user.username|escape }}さん</p>
-                {% endif %}
-            </div>
-        </div>
+    {% if not hide_header %}
+    <div class="header-nav">
+        <h1>{% block header %}🏪 予約システム{% endblock %}</h1>
+        {% if user.is_authenticated %}
+            <p>ようこそ、{{ user.username|escape }}さん</p>
         {% endif %}
-        
+    </div>
+    {% endif %}
+
+    <div class="main-container">
         {% block breadcrumb %}{% endblock %}
         
-        <!-- メッセージ表示 -->
         {% if messages %}
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }}">
-                    {{ message|escape }}
+                    {% if "success" in message.tags %}
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    {% elif "error" in message.tags or "danger" in message.tags %}
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.06 3.377 1.77 3.377h14.995c1.71 0 2.636-1.877 1.77-3.377L13.719 5.86a1.5 1.5 0 00-2.438 0L2.697 16.126zM12 15.75h.008v.008H12v-.008z" />
+                        </svg>
+                    {% elif "warning" in message.tags %}
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                        </svg>
+                    {% elif "info" in message.tags %}
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l-.375.375M12 10.5V6m0 4.5l-.375.375M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    {% endif %}
+                    <p>{{ message|escape }}</p>
                 </div>
             {% endfor %}
         {% endif %}
         
-        {% block content %}
-            <p>コンテンツがありません。</p>
-        {% endblock %}
+        <div class="card">
+            {% block content %}
+                <p>コンテンツがありません。</p>
+            {% endblock %}
+        </div>
         
         {% block footer %}
-        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #dee2e6; text-align: center; color: var(--secondary-color); font-size: 14px;">
-            <p>© 2024 予約システム - すべての権利は保護されています</p>
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #E0E0E0; text-align: center; color: var(--color-medium-gray); font-size: 0.8rem;">
+            <p>© 2024 予約システム - All rights reserved.</p>
         </div>
         {% endblock %}
     </div>
     
     {% block extra_js %}
     <script>
-        // セキュリティ: 基本的なXSS対策
         document.addEventListener('DOMContentLoaded', function() {
-            // 外部リンクにrel="noopener"を追加
+            // 外部リンクにrel="noopener noreferrer"を追加
             document.querySelectorAll('a[target="_blank"]').forEach(link => {
-                if (!link.getAttribute('rel')) {
-                    link.setAttribute('rel', 'noopener noreferrer');
-                }
+                link.setAttribute('rel', 'noopener noreferrer');
             });
             
             // フォームの二重送信防止

@@ -125,3 +125,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # カスタムユーザーモデル
 AUTH_USER_MODEL = 'reservations.CustomUser'
+
+# Twilio SMS settings（本番用は環境変数やSecret管理推奨）
+TWILIO_ACCOUNT_SID = 'your_account_sid_here'
+TWILIO_AUTH_TOKEN = 'your_auth_token_here'
+TWILIO_FROM_NUMBER = '+819012345678'  # Twilioで取得した電話番号

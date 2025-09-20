@@ -14,8 +14,8 @@ urlpatterns = [
     path('tenant/<slug:tenant_slug>/reserve/', views.reserve_slot, name='reserve_slot_by_tenant'),
     
     # 開発者専用
-    path('/developer/', views.developer_dashboard, name='developer_dashboard'),
-    path('/developer/tenants/', views_owner.developer_tenant_list, name='developer_tenant_list'),
+    path('developer/', views.developer_dashboard, name='developer_dashboard'),
+    path('developer/tenants/', views_owner.developer_tenant_list, name='developer_tenant_list'),
 
     # 事業者専用 - 基本機能（後方互換性のため残す）
     path('owner/reserve/', views_owner.owner_reserve_list, name='owner_reserve_list'),

@@ -49,16 +49,16 @@ class ReservationAdmin(admin.ModelAdmin):
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
-	list_display = ('username', 'email', 'role', 'first_name', 'last_name', 'is_staff')
-	search_fields = ('username', 'email', 'first_name', 'last_name')
+	list_display = ('username', 'email', 'phone', 'role', 'first_name', 'last_name', 'is_staff')
+	search_fields = ('username', 'email', 'phone', 'first_name', 'last_name')
 	list_filter = ('role', 'is_staff', 'is_superuser', 'is_active', 'date_joined')
 	
 	fieldsets = UserAdmin.fieldsets + (
-		('追加情報', {'fields': ('role',)}),
+		('追加情報', {'fields': ('role', 'phone')}),
 	)
 	
 	add_fieldsets = UserAdmin.add_fieldsets + (
-		('追加情報', {'fields': ('role',)}),
+		('追加情報', {'fields': ('role', 'phone')}),
 	)
 	
 	def save_model(self, request, obj, form, change):

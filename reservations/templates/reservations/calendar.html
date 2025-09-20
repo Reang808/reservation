@@ -1,198 +1,118 @@
-<!-- filepath: /Users/pc/Documents/project/LINE/reservations/templates/reservations/calendar.html -->
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
-    <title>{{ tenant.name|escape }} - 予約カレンダー</title>
-    <meta name="description" content="{{ tenant.name|escape }}の予約カレンダー">
-    <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            margin: 20px; 
-            background-color: #f8f9fa;
-        }
-        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .tenant-info { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            color: white;
-            padding: 20px; 
-            border-radius: 8px; 
-            margin-bottom: 20px; 
-        }
-        .week-nav { 
-            text-align: center; 
-            margin-bottom: 20px; 
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        .week-nav a { 
-            margin: 0 20px; 
-            padding: 10px 20px; 
-            background: #007bff; 
-            color: white; 
-            text-decoration: none; 
-            border-radius: 6px;
-            transition: background-color 0.3s;
-        }
-        .week-nav a:hover { background: #0056b3; }
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-bottom: 20px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        th, td { border: 1px solid #dee2e6; padding: 12px; text-align: center; }
-        th { background: #343a40; color: white; font-weight: 600; }
-        .closed-day { background: #e9ecef; color: #6c757d; }
-        .available-slot { 
-            background: none; 
-            border: none; 
-            font-size: 16px; 
-            cursor: pointer; 
-            color: #28a745;
-            padding: 8px;
-            border-radius: 4px;
-            transition: all 0.3s;
-            width: 100%;
-        }
-        .available-slot:hover { background: #d4edda; transform: scale(1.05); }
-        .reserved-slot { color: #dc3545; font-weight: bold; }
-        .unavailable-slot { color: #6c757d; }
-        
-        .modal { 
-            display: none; 
-            position: fixed; 
-            z-index: 1000; 
-            left: 0; 
-            top: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(3px);
-        }
-        .modal-content { 
-            background: #fff; 
-            margin: 5% auto; 
-            padding: 30px; 
-            border-radius: 12px; 
-            width: 500px; 
-            max-width: 90%;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-        .close { 
-            float: right; 
-            font-size: 32px; 
-            cursor: pointer; 
-            color: #aaa;
-            transition: color 0.3s;
-        }
-        .close:hover { color: #000; }
-        .form-group { margin-bottom: 20px; }
-        label { 
-            display: block; 
-            margin-bottom: 8px; 
-            font-weight: 600; 
-            color: #495057;
-        }
-        input, select { 
-            width: 100%; 
-            padding: 12px; 
-            border: 2px solid #dee2e6; 
-            border-radius: 6px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-            box-sizing: border-box;
-        }
-        input:focus, select:focus { 
-            outline: none; 
-            border-color: #007bff; 
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-        }
-        .btn { 
-            padding: 12px 24px; 
-            background: #007bff; 
-            color: white; 
-            border: none; 
-            border-radius: 6px; 
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        .btn:hover { background: #0056b3; transform: translateY(-1px); }
-        .btn:disabled { background: #6c757d; cursor: not-allowed; transform: none; }
-        
-        .security-badge {
-            display: inline-block;
-            background: #28a745;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            margin-left: 10px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>{{ tenant.name|escape }} 予約カレンダー <span class="security-badge">SSL保護</span></h1>
-        
-        <!-- テナント情報 -->
-        <div class="tenant-info">
-            <h3>📋 営業情報</h3>
-            <p><strong>🕒 営業時間:</strong> {{ tenant.start_time|time:'H:i' }} - {{ tenant.end_time|time:'H:i' }}</p>
-            <p><strong>⏱️ 予約枠:</strong> {{ tenant.slot_duration }}分間隔</p>
-            <p><strong>📅 予約可能時間:</strong> 現在時刻から{{ tenant.advance_hours }}時間後以降</p>
-            <p><strong>📆 営業日:</strong>
-                {% if tenant.monday_open %}月{% endif %}
-                {% if tenant.tuesday_open %}火{% endif %}
-                {% if tenant.wednesday_open %}水{% endif %}
-                {% if tenant.thursday_open %}木{% endif %}
-                {% if tenant.friday_open %}金{% endif %}
-                {% if tenant.saturday_open %}土{% endif %}
-                {% if tenant.sunday_open %}日{% endif %}
-            </p>
-        </div>
+{% extends 'base.html' %}
+{% block title %}{{ tenant.name|escape }} - 予約カレンダー{% endblock %}
 
-        <!-- 週ナビゲーション -->
-        <div class="week-nav">
-            <a href="{% url 'calendar_by_tenant' tenant.slug %}?week_offset={{ week_offset|add:'-1' }}">← 前週</a>
-            <span><strong>{{ week_days.0|date:'Y年m月d日' }} 〜 {{ week_days.6|date:'m月d日' }}</strong></span>
-            <a href="{% url 'calendar_by_tenant' tenant.slug %}?week_offset={{ week_offset|add:'1' }}">次週 →</a>
+{% block content %}
+<div class="container">
+    <div class="card tenant-info-card">
+        <div class="tenant-header">
+            <h1 class="page-title">{{ tenant.name|escape }} 予約カレンダー</h1>
+            <span class="badge badge-success">SSL保護</span>
         </div>
+        <div class="info-grid">
+            <div class="info-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div class="info-content">
+                    <p class="info-label">営業時間</p>
+                    <p class="info-value">{{ tenant.start_time|time:'H:i' }} - {{ tenant.end_time|time:'H:i' }}</p>
+                </div>
+            </div>
+            <div class="info-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div class="info-content">
+                    <p class="info-label">予約枠</p>
+                    <p class="info-value">{{ tenant.slot_duration }}分間隔</p>
+                </div>
+            </div>
+            <div class="info-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                </svg>
+                <div class="info-content">
+                    <p class="info-label">営業日</p>
+                    <p class="info-value">
+                        {% if tenant.monday_open %}月{% endif %}
+                        {% if tenant.tuesday_open %}火{% endif %}
+                        {% if tenant.wednesday_open %}水{% endif %}
+                        {% if tenant.thursday_open %}木{% endif %}
+                        {% if tenant.friday_open %}金{% endif %}
+                        {% if tenant.saturday_open %}土{% endif %}
+                        {% if tenant.sunday_open %}日{% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="week-nav">
+        <a href="{% url 'calendar_by_tenant' tenant.slug %}?week_offset={{ week_offset|add:'-1' }}" class="btn btn-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            前週
+        </a>
+        <h2 class="current-week-range">
+            {{ week_days.0|date:'Y年m月d日' }} 〜 {{ week_days.6|date:'m月d日' }}
+        </h2>
+        <a href="{% url 'calendar_by_tenant' tenant.slug %}?week_offset={{ week_offset|add:'1' }}" class="btn btn-secondary">
+            次週
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
+        </a>
+    </div>
 
-        <!-- カレンダーテーブル -->
+    <div class="card calendar-table-container">
         <table>
             <thead>
                 <tr>
                     <th>時間 / 日付</th>
                     {% for day in week_days %}
-                        <th>{{ day|date:'m/d' }}<br>({{ day|date:'D' }})</th>
+                        <th class="day-header">
+                            <span class="day-of-week">{{ day|date:'D' }}</span>
+                            <br>
+                            <span class="date">{{ day|date:'m/d' }}</span>
+                        </th>
                     {% endfor %}
                 </tr>
             </thead>
             <tbody>
                 {% for row in calendar_rows %}
                 <tr>
-                    <td><strong>{{ row.0.slot|time:'H:i' }}</strong></td>
+                    <td class="time-slot-header"><strong>{{ row.0.slot|time:'H:i' }}</strong></td>
                     {% for cell in row %}
-                        <td class="{% if not cell.is_open_day %}closed-day{% endif %}">
+                        <td class="calendar-cell {% if not cell.is_open_day %}closed-day{% endif %}">
                             {% if not cell.is_open_day %}
-                                🚫 休業日
+                                <div class="status-content">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                    </svg>
+                                    <p>休業日</p>
+                                </div>
                             {% elif cell.reservation %}
-                                <div class="reserved-slot">❌ 予約済み</div>
+                                <div class="status-content reserved">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.06 3.377 1.77 3.377h14.995c1.71 0 2.636-1.877 1.77-3.377L13.719 5.86a1.5 1.5 0 00-2.438 0L2.697 16.126zM12 15.75h.008v.008H12v-.008z" />
+                                    </svg>
+                                    <p>予約済み</p>
+                                </div>
                             {% elif cell.available %}
-                                <button class="available-slot" onclick="openReserveModal('{{ cell.day|date:'Y-m-d' }}', '{{ cell.slot|time:'H:i' }}')">
-                                    <span style="font-size: 20px;">✅</span><br>
-                                    <small>予約可能</small>
+                                <button class="slot-button available-slot" onclick="openReserveModal('{{ cell.day|date:'Y-m-d' }}', '{{ cell.slot|time:'H:i' }}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <p>予約可能</p>
                                 </button>
                             {% else %}
-                                <span class="unavailable-slot">⏰<br><small>予約不可</small></span>
+                                <div class="status-content unavailable">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <p>予約不可</p>
+                                </div>
                             {% endif %}
                         </td>
                     {% endfor %}
@@ -200,159 +120,480 @@
                 {% endfor %}
             </tbody>
         </table>
-
-        <!-- 予約モーダル -->
-        <div id="reserveModal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closeModal()">&times;</span>
-                <h2>📝 予約フォーム</h2>
-                <form id="reserveForm" method="post" action="{% url 'reserve_slot_by_tenant' tenant.slug %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="date" id="reserveDate">
-                    <input type="hidden" name="time_slot" id="reserveTime">
-                    
-                    <div class="form-group">
-                        <label>📅 予約日時:</label>
-                        <div id="reserveDateTime" style="font-size: 18px; color: #007bff; font-weight: bold; padding: 10px; background: #f8f9fa; border-radius: 4px;"></div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="menu_id">🍽️ メニュー選択:</label>
-                        <select name="menu_id" id="menu_id" required>
-                            <option value="">メニューを選択してください</option>
-                            {% for menu in tenant.menus.all %}
-                                <option value="{{ menu.id }}">
-                                    {{ menu.name|escape }}
-                                    {% if menu.price %} - ¥{{ menu.price|floatformat:0 }}{% endif %}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="customer_name">👤 お名前:</label>
-                        <input type="text" name="customer_name" id="customer_name" required maxlength="100" placeholder="お名前を入力してください" autocomplete="name">
-                    </div>
-                    
-                    <div class="form-group" style="text-align: center; margin-top: 30px;">
-                        <button type="button" onclick="closeModal()" style="margin-right: 15px; background: #6c757d;">キャンセル</button>
-                        <button type="submit" class="btn">🎯 予約する</button>
-                    </div>
-                </form>
-            </div>
-        </div>
     </div>
+</div>
 
-    <script>
-        // CSRFトークンを取得
-        function getCSRFToken() {
-            return document.querySelector('[name=csrfmiddlewaretoken]').value;
+<div id="reserveModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>予約フォーム</h2>
+            <span class="close" onclick="closeModal()">&times;</span>
+        </div>
+        <form id="reserveForm" method="post" action="{% url 'reserve_slot_by_tenant' tenant.slug %}">
+            {% csrf_token %}
+            <input type="hidden" name="date" id="reserveDate">
+            <input type="hidden" name="time_slot" id="reserveTime">
+            
+            <div class="form-group">
+                <label>予約日時:</label>
+                <div id="reserveDateTime" class="info-box"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="menu_id">メニュー選択:</label>
+                <select name="menu_id" id="menu_id" class="form-select" required>
+                    <option value="">メニューを選択してください</option>
+                    {% for menu in tenant.menus.all %}
+                        <option value="{{ menu.id }}">
+                            {{ menu.name|escape }}
+                            {% if menu.price %} - ¥{{ menu.price|floatformat:0 }}{% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="customer_name">お名前:</label>
+                <input type="text" name="customer_name" id="customer_name" class="form-input" required maxlength="100" placeholder="お名前を入力してください" autocomplete="name">
+            </div>
+            <div class="form-group">
+                <label for="customer_phone">電話番号:</label>
+                <input type="tel" name="customer_phone" id="customer_phone" class="form-input" required maxlength="20" placeholder="電話番号を入力してください" autocomplete="tel">
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" onclick="closeModal()" class="btn btn-secondary">キャンセル</button>
+                <button type="submit" class="btn btn-primary">予約する</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+/* カスタムCSSは base.html に集約することを推奨します */
+
+/* カレンダーページ固有のスタイル */
+.tenant-info-card {
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+.tenant-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.page-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0;
+    color: #333;
+}
+
+.badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.badge-success {
+    background-color: #4AD295;
+    color: white;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.info-item svg {
+    width: 24px;
+    height: 24px;
+    color: #8E7CC3;
+}
+
+.info-item .info-label {
+    font-size: 0.85rem;
+    color: #999;
+    margin-bottom: 2px;
+}
+
+.info-item .info-value {
+    font-weight: bold;
+    color: #555;
+    margin: 0;
+}
+
+.week-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.week-nav .btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+}
+
+.week-nav .current-week-range {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.calendar-table-container {
+    padding: 25px 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+th, td {
+    border: 1px solid #f0f4f8;
+    padding: 12px;
+    text-align: center;
+}
+
+thead th {
+    background: #8E7CC3;
+    color: white;
+    font-weight: 600;
+    padding: 15px 12px;
+}
+
+.day-header .day-of-week {
+    font-size: 0.9em;
+    font-weight: bold;
+}
+
+.day-header .date {
+    font-size: 0.8em;
+    font-weight: normal;
+}
+
+.time-slot-header {
+    background: #f0f4f8;
+    font-weight: bold;
+    color: #555;
+    text-align: center;
+}
+
+.calendar-cell {
+    position: relative;
+    padding: 8px;
+}
+
+.status-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+    font-size: 0.8rem;
+    color: #999;
+}
+
+.status-content svg {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
+}
+
+.status-content.reserved svg,
+.status-content.unavailable svg {
+    color: #E55C5C;
+}
+
+.status-content p {
+    margin: 0;
+}
+
+.closed-day .status-content svg {
+    color: #BDBDBD;
+}
+
+.slot-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.available-slot {
+    background-color: transparent;
+    color: #4AD295;
+    font-weight: bold;
+}
+
+.available-slot:hover {
+    background-color: #E0F5EE;
+    transform: scale(1.05);
+}
+
+.available-slot svg {
+    color: #4AD295;
+    width: 32px;
+    height: 32px;
+}
+
+/* モーダル */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    overflow: auto;
+}
+
+.modal-content {
+    background: #fff;
+    margin: 5% auto;
+    padding: 30px;
+    border-radius: 12px;
+    width: 500px;
+    max-width: 90%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    font-size: 1.5rem;
+    margin: 0;
+    color: #333;
+}
+
+.close {
+    font-size: 32px;
+    font-weight: 300;
+    cursor: pointer;
+    color: #aaa;
+    transition: color 0.3s;
+}
+
+.close:hover {
+    color: #8E7CC3;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+}
+
+.form-select, .form-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #E0E0E0;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    background-color: #FAFAFA;
+    transition: all 0.3s ease;
+}
+
+.form-select:focus, .form-input:focus {
+    outline: none;
+    border-color: #8E7CC3;
+    box-shadow: 0 0 0 2px rgba(142, 124, 195, 0.2);
+}
+
+.info-box {
+    background-color: #f8f9fa;
+    border-left: 4px solid #8E7CC3;
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    color: #333;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    .week-nav {
+        flex-direction: column;
+        gap: 15px;
+    }
+    .week-nav .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    table {
+        font-size: 0.9em;
+    }
+    th, td {
+        padding: 8px;
+    }
+    .modal-content {
+        padding: 20px;
+    }
+}
+</style>
+
+<script>
+    // CSRFトークンを取得
+    function getCSRFToken() {
+        const token = document.querySelector('[name=csrfmiddlewaretoken]');
+        return token ? token.value : '';
+    }
+
+    function openReserveModal(date, time) {
+        // 日時を設定
+        document.getElementById('reserveDate').value = date;
+        document.getElementById('reserveTime').value = time;
+        
+        // 日時を表示用にフォーマット
+        const dateObj = new Date(date + 'T' + time);
+        const options = { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric', 
+            weekday: 'long',
+            hour: '2-digit',
+            minute: '2-digit'
+        };
+        const formattedDate = dateObj.toLocaleDateString('ja-JP', options);
+        document.getElementById('reserveDateTime').textContent = formattedDate;
+        
+        // モーダルを表示
+        document.getElementById('reserveModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        document.getElementById('reserveModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('reserveModal');
+        if (event.target === modal) {
+            closeModal();
         }
+    }
 
-        function openReserveModal(date, time) {
-            // XSS対策: 入力値をサニタイズ
-            const sanitizedDate = date.replace(/[<>&"']/g, '');
-            const sanitizedTime = time.replace(/[<>&"']/g, '');
-            
-            // フォームをリセット
-            document.getElementById('reserveForm').reset();
-            
-            // 日時を設定
-            document.getElementById('reserveDate').value = sanitizedDate;
-            document.getElementById('reserveTime').value = sanitizedTime;
-            
-            // 日時を表示用にフォーマット
-            try {
-                const dateObj = new Date(sanitizedDate + 'T' + sanitizedTime);
-                const options = { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric', 
-                    weekday: 'long',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                };
-                document.getElementById('reserveDateTime').textContent = dateObj.toLocaleDateString('ja-JP', options);
-            } catch (e) {
-                console.error('日時のフォーマットエラー:', e);
-                document.getElementById('reserveDateTime').textContent = sanitizedDate + ' ' + sanitizedTime;
-            }
-            
-            // モーダルを表示
-            document.getElementById('reserveModal').style.display = 'block';
-            document.body.style.overflow = 'hidden'; // スクロール防止
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeModal();
         }
+    });
 
-        function closeModal() {
-            document.getElementById('reserveModal').style.display = 'none';
-            document.body.style.overflow = 'auto'; // スクロール復元
-        }
-
-        // モーダル外クリックで閉じる
-        window.onclick = function(event) {
-            const modal = document.getElementById('reserveModal');
-            if (event.target === modal) {
-                closeModal();
-            }
-        }
-
-        // ESCキーでモーダルを閉じる
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeModal();
-            }
-        });
-
-        // フォーム送信処理（セキュリティ強化）
-        document.getElementById('reserveForm').onsubmit = function(e) {
-            e.preventDefault();
-            
-            const submitButton = this.querySelector('button[type="submit"]');
-            const originalText = submitButton.textContent;
-            submitButton.disabled = true;
-            submitButton.textContent = '⏳ 予約中...';
-            
-            // 入力値検証
-            const customerName = document.getElementById('customer_name').value.trim();
-            if (!customerName || customerName.length > 100) {
-                alert('お名前は1文字以上100文字以内で入力してください。');
-                submitButton.disabled = false;
-                submitButton.textContent = originalText;
-                return;
-            }
-            
-            const formData = new FormData(this);
-            fetch(this.action, {
-                method: 'POST',
-                headers: { 
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': getCSRFToken()
-                },
-                body: formData
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert('✅ 予約が完了しました！');
-                    closeModal();
-                    setTimeout(() => location.reload(), 500);
-                } else {
-                    throw new Error('予約に失敗しました');
-                }
-            })
-            .catch(error => {
-                console.error('予約エラー:', error);
-                alert('❌ 予約に失敗しました。すでに予約が入っているか、ネットワークエラーが発生しました。');
-            })
-            .finally(() => {
-                submitButton.disabled = false;
-                submitButton.textContent = originalText;
-            });
+    document.getElementById('reserveForm').onsubmit = function(e) {
+        e.preventDefault();
+        
+        const submitButton = this.querySelector('.btn-primary');
+        const originalText = submitButton.textContent;
+        submitButton.disabled = true;
+        submitButton.textContent = '予約中...';
+        
+        const customerName = document.getElementById('customer_name').value.trim();
+        const menuId = document.getElementById('menu_id').value;
+        
+        if (!customerName || customerName.length > 100 || !menuId) {
+            alert('お名前とメニューを正しく入力してください。');
+            submitButton.disabled = false;
+            submitButton.textContent = originalText;
+            return;
         }
         
-        // ページ読み込み完了時の初期化
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('予約カレンダーが読み込まれました');
+        const formData = new FormData(this);
+        fetch(this.action, {
+            method: 'POST',
+            headers: { 
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                return response.json().then(err => { throw new Error(err.error || '予約に失敗しました'); });
+            }
+        })
+        .then(data => {
+            alert('✅ 予約が完了しました！');
+            closeModal();
+            // 予約成功後、カレンダーを再読み込みして最新の状態に
+            location.reload();
+        })
+        .catch(error => {
+            console.error('予約エラー:', error);
+            alert(`❌ 予約に失敗しました: ${error.message}`);
+        })
+        .finally(() => {
+            submitButton.disabled = false;
+            submitButton.textContent = originalText;
         });
-    </script>
-</body>
-</html>
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('予約カレンダーが読み込まれました');
+    });
+</script>
+{% endblock %}

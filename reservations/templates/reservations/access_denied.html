@@ -1,4 +1,3 @@
-<!-- filepath: /Users/pc/Documents/project/LINE/reservations/templates/reservations/access_denied.html -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -6,88 +5,178 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>アクセス拒否 - 予約システム</title>
-    <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            margin: 40px; 
-            text-align: center; 
-            background-color: #f8f9fa;
-        }
-        .error-container { 
-            max-width: 600px; 
-            margin: 0 auto; 
-            background: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .error-icon { 
-            font-size: 80px; 
-            color: #dc3545; 
-            margin-bottom: 20px; 
-        }
-        .error-title { 
-            font-size: 32px; 
-            color: #343a40; 
-            margin-bottom: 20px; 
-        }
-        .error-message { 
-            font-size: 18px; 
-            color: #6c757d; 
-            margin-bottom: 30px; 
-            line-height: 1.5;
-        }
-        .btn { 
-            display: inline-block;
-            padding: 12px 24px; 
-            background: #007bff; 
-            color: white; 
-            text-decoration: none; 
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-        .btn:hover {
-            background: #0056b3;
-        }
-        .security-notice {
-            font-size: 14px;
-            color: #6c757d;
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-            border-left: 4px solid #ffc107;
-        }
-    </style>
 </head>
 <body>
-    <div class="error-container">
-        <div class="error-icon">🚫</div>
-        <h1 class="error-title">アクセスが拒否されました</h1>
-        
-        {% if message %}
-            <p class="error-message">{{ message|escape }}</p>
-        {% else %}
-            <p class="error-message">
-                このページにアクセスする権限がありません。<br>
-                {% if required_roles %}
-                    必要な権限: {{ required_roles|join:", "|escape }}<br>
-                {% endif %}
-                {% if user_role %}
-                    あなたの権限: {{ user_role|escape }}
-                {% endif %}
-            </p>
-        {% endif %}
-        
-        <div class="security-notice">
-            <strong>セキュリティ通知:</strong> 
-            このアクセス試行は記録されています。不正なアクセスが続く場合は、
-            管理者に通報される可能性があります。
-        </div>
-        
-        <div style="margin-top: 30px;">
-            <a href="/" class="btn">ログインページに戻る</a>
+    <div class="container error-container">
+        <div class="card error-card">
+            <div class="error-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                </svg>
+            </div>
+            <h1 class="error-title">アクセスが拒否されました</h1>
+            
+            {% if message %}
+                <p class="error-message">{{ message|escape }}</p>
+            {% else %}
+                <p class="error-message">
+                    このページにアクセスする権限がありません。<br>
+                    {% if required_roles %}
+                        <span class="info-label">必要な権限:</span> <strong class="info-value">{{ required_roles|join:", "|escape }}</strong><br>
+                    {% endif %}
+                    {% if user_role %}
+                        <span class="info-label">あなたの権限:</span> <strong class="info-value">{{ user_role|escape }}</strong>
+                    {% endif %}
+                </p>
+            {% endif %}
+            
+            <div class="security-notice">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                </svg>
+                <p>
+                    <strong>セキュリティ通知:</strong> このアクセス試行は記録されています。
+                    不正なアクセスが続く場合は、管理者に通報される可能性があります。
+                </p>
+            </div>
+            
+            <div class="action-buttons">
+                <a href="/" class="btn btn-primary">ログインページに戻る</a>
+            </div>
         </div>
     </div>
+
+    <style>
+        /* 全体のスタイル */
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background-color: #f0f4f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .error-container { 
+            max-width: 500px; 
+            width: 90%;
+        }
+
+        .card { 
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .error-icon { 
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px auto;
+            color: #E55C5C; 
+        }
+
+        .error-title { 
+            font-size: 1.6rem; 
+            font-weight: 600;
+            color: #333; 
+            margin-bottom: 10px; 
+        }
+
+        .error-message { 
+            font-size: 1rem; 
+            color: #555; 
+            margin-bottom: 25px; 
+            line-height: 1.6;
+        }
+
+        .info-label {
+            font-weight: normal;
+            color: #666;
+        }
+
+        .info-value {
+            color: #333;
+        }
+
+        /* セキュリティ通知 */
+        .security-notice {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            background-color: #fff8f8;
+            border: 1px solid #E55C5C;
+            color: #E55C5C;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .security-notice svg {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            color: #E55C5C;
+        }
+        
+        .security-notice p {
+            margin: 0;
+            font-size: 0.95em;
+        }
+
+        /* ボタンのスタイル */
+        .action-buttons {
+            margin-top: 20px;
+        }
+
+        .btn { 
+            display: inline-block;
+            width: 100%;
+            max-width: 320px;
+            padding: 12px 24px; 
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none; 
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-primary { 
+            background-color: #8E7CC3;
+            color: white; 
+        }
+
+        .btn-primary:hover {
+            background-color: #7A69A9;
+            transform: translateY(-2px);
+        }
+
+        /* レスポンシブ対応 */
+        @media (max-width: 480px) {
+            .card {
+                padding: 20px;
+            }
+            .error-title {
+                font-size: 1.4rem;
+            }
+            .error-message {
+                font-size: 0.95rem;
+            }
+            .btn {
+                padding: 10px;
+                font-size: 0.95rem;
+            }
+            .security-notice {
+                padding: 12px;
+            }
+        }
+    </style>
 </body>
 </html>

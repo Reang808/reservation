@@ -1,0 +1,53 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "makemigrations reservations",
+			"type": "shell",
+			"command": "python3",
+			"args": [
+				"manage.py",
+				"makemigrations",
+				"reservations"
+			]
+		},
+		{
+			"label": "makemigrations reservations",
+			"type": "shell",
+			"command": "python3",
+			"args": [
+				"manage.py",
+				"makemigrations",
+				"reservations"
+			]
+		},
+		{
+			"label": "migrate",
+			"type": "shell",
+			"command": "python3",
+			"args": [
+				"manage.py",
+				"migrate"
+			]
+		},
+		{
+			"label": "makemigrations reservations",
+			"type": "shell",
+			"command": "python3",
+			"args": [
+				"manage.py",
+				"makemigrations",
+				"reservations"
+			]
+		},
+		{
+			"label": "migrate",
+			"type": "shell",
+			"command": "python3",
+			"args": [
+				"manage.py",
+				"migrate"
+			]
+		}
+	]
+}
