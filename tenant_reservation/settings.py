@@ -76,8 +76,12 @@ WSGI_APPLICATION = 'tenant_reservation.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': 'reservation_system',
+    'USER': 'Reang_CEO',
+    'PASSWORD': 'Reang.0718',
+    'HOST': 'localhost',
+    'PORT': '5432',
     }
 }
 

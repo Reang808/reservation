@@ -16,7 +16,7 @@ def send_sms(to_number, message):
         print(f"SMS送信エラー: {e}")
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, date, timedelta
 from .models import Tenant, Menu, Reservation
@@ -167,7 +167,7 @@ def reserve_slot(request, tenant_slug=None):
             raise ValueError("この時間は既に予約済みです")
         
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return HttpResponse('OK')
+            return JsonResponse({'status': 'success'})
             
     except ValueError as e:
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
