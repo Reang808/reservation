@@ -10,8 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
-
+from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,10 +21,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ci^#s3(v54#teb63ha-#nvoo@h_#8m)z@+cva13%!f@7k4xo$^'
+SECRET_KEY = config('SECRET_KEY')
+# 'django-insecure-ci^#s3(v54#teb63ha-#nvoo@h_#8m)z@+cva13%!f@7k4xo$^'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = ['reang-reservation.jp', 'www.reang-reservation.jp', '163.44.123.195']
 
