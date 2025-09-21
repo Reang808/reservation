@@ -4,5 +4,3 @@ requests>=2.31.0
 twilio>=8.0.0
 python-decouple>=3.8
 psycopg2-binary>=2.9.0
-functools
-functools
