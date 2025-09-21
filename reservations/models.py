@@ -138,7 +138,7 @@ class Reservation(models.Model):
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='reservations', verbose_name='テナント')
     menu = models.ForeignKey(Menu, on_delete=models.SET_NULL, null=True, blank=True, related_name='reservations', verbose_name='メニュー')
     customer_name = models.CharField(max_length=100, verbose_name='顧客名')
-    customer_phone = models.CharField(max_length=20, verbose_name='電話番号', default='')
+    customer_phone = models.CharField(max_length=20, verbose_name='電話番号', default='', blank=True)
     date = models.DateField(verbose_name='予約日')
     time_slot = models.TimeField(verbose_name='予約時間')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='予約作成日時')

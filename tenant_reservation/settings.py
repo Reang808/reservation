@@ -1,3 +1,5 @@
+# ログアウト後のリダイレクト先（login.html）
+LOGOUT_REDIRECT_URL = '/'
 """
 Django settings for tenant_reservation project.
 
@@ -27,7 +29,8 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['reang-reservation.jp', 'www.reang-reservation.jp', '163.44.123.195']
+ALLOWED_HOSTS = ['reang-reservation.jp', 'www.reang-reservation.jp', '163.44.123.195',]
+# '127.0.0.1:8000', '127.0.0.1', 'localhost'
 
 
 # Application definition

@@ -83,10 +83,11 @@ def owner_reserve_list_by_tenant(request, tenant_slug):
         time_str = request.POST.get('time_slot', '').strip()
         menu_id = request.POST.get('menu_id', '').strip()
         customer_name = request.POST.get('customer_name', '').strip()
+        customer_phone = request.POST.get('customer_phone', '').strip()
         
         try:
             # 入力値検証
-            if not all([date_str, time_str, customer_name]):
+            if not all([date_str, time_str, customer_name, customer_phone]):
                 raise ValidationError('必須項目が不足しています。')
             
             if len(customer_name) > 100:
@@ -113,6 +114,7 @@ def owner_reserve_list_by_tenant(request, tenant_slug):
                 tenant=tenant,
                 menu=menu,
                 customer_name=customer_name,
+                customer_phone=customer_phone,
                 date=reserve_date,
                 time_slot=reserve_time
             )

@@ -1,125 +1,377 @@
 {% extends 'base.html' %}
 {% block title %}{{ tenant.name|escape }} - 予約カレンダー{% endblock %}
 
-{% block content %}
-<div class="container">
-    <div class="card tenant-info-card">
-        <div class="tenant-header">
-            <h1 class="page-title">{{ tenant.name|escape }} 予約カレンダー</h1>
-            <span class="badge badge-success">SSL保護</span>
-        </div>
-        <div class="info-grid">
-            <div class="info-item">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div class="info-content">
-                    <p class="info-label">営業時間</p>
-                    <p class="info-value">{{ tenant.start_time|time:'H:i' }} - {{ tenant.end_time|time:'H:i' }}</p>
-                </div>
-            </div>
-            <div class="info-item">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div class="info-content">
-                    <p class="info-label">予約枠</p>
-                    <p class="info-value">{{ tenant.slot_duration }}分間隔</p>
-                </div>
-            </div>
-            <div class="info-item">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                </svg>
-                <div class="info-content">
-                    <p class="info-label">営業日</p>
-                    <p class="info-value">
-                        {% if tenant.monday_open %}月{% endif %}
-                        {% if tenant.tuesday_open %}火{% endif %}
-                        {% if tenant.wednesday_open %}水{% endif %}
-                        {% if tenant.thursday_open %}木{% endif %}
-                        {% if tenant.friday_open %}金{% endif %}
-                        {% if tenant.saturday_open %}土{% endif %}
-                        {% if tenant.sunday_open %}日{% endif %}
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="week-nav">
-        <a href="{% url 'calendar_by_tenant' tenant.slug %}?week_offset={{ week_offset|add:'-1' }}" class="btn btn-secondary">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-            </svg>
-            前週
-        </a>
-        <h2 class="current-week-range">
-            {{ week_days.0|date:'Y年m月d日' }} 〜 {{ week_days.6|date:'m月d日' }}
-        </h2>
-        <a href="{% url 'calendar_by_tenant' tenant.slug %}?week_offset={{ week_offset|add:'1' }}" class="btn btn-secondary">
-            次週
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
-        </a>
-    </div>
+{% block extra_head %}
+<style>
+/* カレンダーページ固有のスタイル */
+.tenant-info-card {
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 32px;
+    background: var(--color-white);
+}
 
-    <div class="card calendar-table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>時間 / 日付</th>
-                    {% for day in week_days %}
-                        <th class="day-header">
-                            <span class="day-of-week">{{ day|date:'D' }}</span>
-                            <br>
-                            <span class="date">{{ day|date:'m/d' }}</span>
-                        </th>
+.tenant-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+}
+
+.page-title {
+    font-size: 1.6rem;
+    margin: 0;
+}
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.badge-success {
+    background-color: var(--color-success);
+    color: white;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.info-item svg {
+    width: 28px;
+    height: 28px;
+    color: var(--color-primary);
+    flex-shrink: 0;
+}
+
+.info-label {
+    font-size: 0.85rem;
+    color: var(--color-text-light);
+    margin: 0 0 4px;
+}
+
+.info-value {
+    font-weight: 500;
+    color: var(--color-text);
+    margin: 0;
+}
+
+.week-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.week-nav .btn {
+    padding: 10px 16px;
+}
+
+.current-week-range {
+    font-size: 1.3rem;
+    font-weight: 500;
+    margin: 0;
+    text-align: center;
+}
+
+/* --- デスクトップ用カレンダー --- */
+.desktop-calendar {
+    display: block;
+}
+.calendar-table-container .table-container {
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+.day-header {
+    padding: 12px 8px;
+}
+.day-header .day-of-week {
+    font-size: 1rem;
+}
+.day-header .date {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+.time-slot-header {
+    background: #F9F9F9;
+    font-weight: 500;
+    color: var(--color-text-light);
+    min-width: 80px;
+}
+.calendar-cell {
+    min-width: 100px;
+    height: 80px;
+    vertical-align: middle;
+}
+.status-content, .slot-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    height: 100%;
+    padding: 4px;
+    font-size: 0.8rem;
+    text-align: center;
+}
+.status-content svg { width: 20px; height: 20px; }
+.closed-day, .unavailable { color: var(--color-text-light); }
+.reserved { color: var(--color-danger); }
+.slot-button {
+    background: transparent;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--color-success);
+    font-weight: 500;
+}
+.slot-button svg { width: 24px; height: 24px; }
+.slot-button:hover {
+    background: #e8f5e9;
+    border-color: var(--color-success);
+    transform: scale(1.03);
+}
+
+/* --- モバイル用カレンダー --- */
+.mobile-calendar {
+    display: none;
+}
+/* NEW: 日付チップセレクター */
+.date-selector {
+    display: flex;
+    justify-content: space-around;
+    gap: 4px; /* チップ間の最小の隙間 */
+    margin-bottom: 24px;
+}
+.date-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1; /* チップを均等に広げる */
+    padding: 8px 4px;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+.date-chip:hover {
+    background-color: #f9f9f9;
+}
+.date-chip.active {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+.date-chip .chip-day {
+    font-size: 0.75rem;
+    color: var(--color-text-light);
+}
+.date-chip .chip-date {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-top: 4px;
+}
+.date-chip.active .chip-day,
+.date-chip.active .chip-date {
+    color: var(--color-white);
+}
+
+.calendar-day-panel { display: none; }
+.calendar-day-panel.active { display: block; }
+
+.slot-list { list-style: none; }
+.slot-item {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid var(--color-border);
+}
+.slot-item:last-child { border-bottom: none; }
+.slot-time {
+    font-weight: 500;
+    width: 80px;
+}
+.slot-status { flex-grow: 1; text-align: right; }
+.slot-status .btn { width: 100%; max-width: 150px; }
+.status-text { color: var(--color-text-light); font-size: 0.9rem; }
+
+/* --- モーダル (base.htmlのスタイルを継承) --- */
+.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); overflow: auto; }
+.modal-content { background: var(--color-white); margin: 8% auto; padding: 32px; border-radius: 16px; width: 500px; max-width: 90%; box-shadow: var(--shadow-lg); animation: fadeIn 0.3s ease-out; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-border); padding-bottom: 16px; margin-bottom: 24px; }
+.modal-header h2 { margin: 0; }
+.close { font-size: 32px; cursor: pointer; color: var(--color-text-light); transition: color 0.2s; }
+.close:hover { color: var(--color-primary); }
+.info-box { background: #f8f9fa; border-left: 4px solid var(--color-primary); padding: 12px 16px; border-radius: 8px; font-weight: 500; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 16px; margin-top: 32px; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* レスポンシブ切り替え */
+@media (max-width: 768px) {
+    .desktop-calendar { display: none; }
+    .mobile-calendar { display: block; }
+    .week-nav { flex-direction: column; gap: 16px; }
+    .current-week-range { font-size: 1.1rem; }
+}
+
+@media (max-width: 480px) {
+    .page-title { font-size: 1.4rem; }
+    .info-grid { grid-template-columns: 1fr; }
+    .modal-actions { flex-direction: column; }
+    .modal-actions .btn { width: 100%; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tenant-info-card">
+    <div class="tenant-header">
+        <h1 class="page-title">{{ tenant.name|escape }} 予約カレンダー</h1>
+        <span class="badge badge-success">✓ SSLで保護されています</span>
+    </div>
+    <div class="info-grid">
+        <div class="info-item">
+            <svg xmlns="http://www.w.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <div>
+                <p class="info-label">営業時間</p>
+                <p class="info-value">{{ tenant.start_time|time:'H:i' }} - {{ tenant.end_time|time:'H:i' }}</p>
+            </div>
+        </div>
+        <div class="info-item">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V8.25m0 12V18m0-12H5.25M9 6.75h5.25M9 18H5.25m3.75 0h5.25m-9-3.75h13.5m-13.5-9H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-11.25c0-.621-.504-1.125-1.125-1.125H15M12 15h3.75" /></svg>
+            <div>
+                <p class="info-label">予約枠</p>
+                <p class="info-value">{{ tenant.slot_duration }}分間隔</p>
+            </div>
+        </div>
+        <div class="info-item">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>
+            <div>
+                <p class="info-label">営業日</p>
+                <p class="info-value">
+                    {% for day in "月火水木金土日" %}
+                        {% if day == "月" and tenant.monday_open %}月 {% endif %}
+                        {% if day == "火" and tenant.tuesday_open %}火 {% endif %}
+                        {% if day == "水" and tenant.wednesday_open %}水 {% endif %}
+                        {% if day == "木" and tenant.thursday_open %}木 {% endif %}
+                        {% if day == "金" and tenant.friday_open %}金 {% endif %}
+                        {% if day == "土" and tenant.saturday_open %}土 {% endif %}
+                        {% if day == "日" and tenant.sunday_open %}日 {% endif %}
                     {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in calendar_rows %}
-                <tr>
-                    <td class="time-slot-header"><strong>{{ row.0.slot|time:'H:i' }}</strong></td>
-                    {% for cell in row %}
-                        <td class="calendar-cell {% if not cell.is_open_day %}closed-day{% endif %}">
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="week-nav">
+    <a href="?week_offset={{ week_offset|add:'-1' }}" class="btn btn-secondary">&lt; 前週</a>
+    <h2 class="current-week-range">{{ week_days.0|date:'Y年n月j日' }} ~ {{ week_days.6|date:'n月j日' }}</h2>
+    <a href="?week_offset={{ week_offset|add:'1' }}" class="btn btn-secondary">次週 &gt;</a>
+</div>
+
+<div class="desktop-calendar">
+    <div class="card calendar-table-container">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="time-slot-header">時間</th>
+                        {% for day in week_days %}
+                        <th class="day-header">
+                            <span class="day-of-week">{{ day|date:"D" }}</span><br>
+                            <span class="date">{{ day|date:"n/j" }}</span>
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in calendar_rows %}
+                    <tr>
+                        <td class="time-slot-header"><strong>{{ row.0.slot|time:"H:i" }}</strong></td>
+                        {% for cell in row %}
+                        <td class="calendar-cell">
                             {% if not cell.is_open_day %}
-                                <div class="status-content">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                                    </svg>
-                                    <p>休業日</p>
-                                </div>
+                                <div class="status-content closed-day">休業日</div>
                             {% elif cell.reservation %}
-                                <div class="status-content reserved">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.06 3.377 1.77 3.377h14.995c1.71 0 2.636-1.877 1.77-3.377L13.719 5.86a1.5 1.5 0 00-2.438 0L2.697 16.126zM12 15.75h.008v.008H12v-.008z" />
-                                    </svg>
-                                    <p>予約済み</p>
-                                </div>
+                                <div class="status-content reserved">予約済</div>
                             {% elif cell.available %}
-                                <button class="slot-button available-slot" onclick="openReserveModal('{{ cell.day|date:'Y-m-d' }}', '{{ cell.slot|time:'H:i' }}')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <p>予約可能</p>
+                                <button class="slot-button" onclick="openReserveModal('{{ cell.day|date:'Y-m-d' }}', '{{ cell.slot|time:'H:i' }}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    <span>予約</span>
                                 </button>
                             {% else %}
-                                <div class="status-content unavailable">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <p>予約不可</p>
-                                </div>
+                                <div class="status-content unavailable">-</div>
                             {% endif %}
                         </td>
+                        {% endfor %}
+                    </tr>
                     {% endfor %}
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="mobile-calendar">
+    <div class="card">
+        <div class="date-selector">
+            {% for day in week_days %}
+            <div class="date-chip {% if forloop.first %}active{% endif %}" data-day-index="{{ forloop.counter0 }}">
+                <span class="chip-day">{{ day|date:"D" }}</span>
+                <span class="chip-date">{{ day|date:"j" }}</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="calendar-panels">
+            {% for day in week_days %}
+            <div class="calendar-day-panel {% if forloop.first %}active{% endif %}" data-day-index="{{ forloop.counter0 }}">
+                <ul class="slot-list">
+                    {% for row in calendar_rows %}
+                        {% with cell=row|slice:forloop.counter|first %}
+                        <li class="slot-item">
+                            <div class="slot-time">{{ cell.slot|time:"H:i" }}</div>
+                            <div class="slot-status">
+                                {% if not cell.is_open_day %}
+                                    <span class="status-text">休業日</span>
+                                {% elif cell.reservation %}
+                                    <span class="status-text reserved">予約済</span>
+                                {% elif cell.available %}
+                                    <button class="btn btn-primary" onclick="openReserveModal('{{ cell.day|date:'Y-m-d' }}', '{{ cell.slot|time:'H:i' }}')">予約する</button>
+                                {% else %}
+                                    <span class="status-text">予約不可</span>
+                                {% endif %}
+                            </div>
+                        </li>
+                        {% endwith %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 </div>
 
@@ -138,7 +390,6 @@
                 <label>予約日時:</label>
                 <div id="reserveDateTime" class="info-box"></div>
             </div>
-            
             <div class="form-group">
                 <label for="menu_id">メニュー選択:</label>
                 <select name="menu_id" id="menu_id" class="form-select" required>
@@ -151,390 +402,70 @@
                     {% endfor %}
                 </select>
             </div>
-            
             <div class="form-group">
                 <label for="customer_name">お名前:</label>
-                <input type="text" name="customer_name" id="customer_name" class="form-input" required maxlength="100" placeholder="お名前を入力してください" autocomplete="name">
+                <input type="text" name="customer_name" id="customer_name" class="form-input" required placeholder="例：山田 花子" autocomplete="name">
             </div>
             <div class="form-group">
                 <label for="customer_phone">電話番号:</label>
-                <input type="tel" name="customer_phone" id="customer_phone" class="form-input" required maxlength="20" placeholder="電話番号を入力してください" autocomplete="tel">
+                <input type="tel" name="customer_phone" id="customer_phone" class="form-input" required placeholder="例：09012345678" autocomplete="tel">
             </div>
             
             <div class="modal-actions">
                 <button type="button" onclick="closeModal()" class="btn btn-secondary">キャンセル</button>
-                <button type="submit" class="btn btn-primary">予約する</button>
+                <button type="submit" class="btn btn-primary">この内容で予約する</button>
             </div>
         </form>
     </div>
 </div>
+{% endblock %}
 
-<style>
-/* カスタムCSSは base.html に集約することを推奨します */
-
-/* カレンダーページ固有のスタイル */
-.tenant-info-card {
-    padding: 25px;
-    margin-bottom: 25px;
-}
-
-.tenant-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 15px;
-    margin-bottom: 20px;
-}
-
-.page-title {
-    font-size: 1.8rem;
-    font-weight: 600;
-    margin: 0;
-    color: #333;
-}
-
-.badge {
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: bold;
-}
-
-.badge-success {
-    background-color: #4AD295;
-    color: white;
-}
-
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-}
-
-.info-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.info-item svg {
-    width: 24px;
-    height: 24px;
-    color: #8E7CC3;
-}
-
-.info-item .info-label {
-    font-size: 0.85rem;
-    color: #999;
-    margin-bottom: 2px;
-}
-
-.info-item .info-value {
-    font-weight: bold;
-    color: #555;
-    margin: 0;
-}
-
-.week-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-}
-
-.week-nav .btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    font-size: 0.9rem;
-}
-
-.week-nav .current-week-range {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin: 0;
-}
-
-.calendar-table-container {
-    padding: 25px 0;
-}
-
-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-}
-
-th, td {
-    border: 1px solid #f0f4f8;
-    padding: 12px;
-    text-align: center;
-}
-
-thead th {
-    background: #8E7CC3;
-    color: white;
-    font-weight: 600;
-    padding: 15px 12px;
-}
-
-.day-header .day-of-week {
-    font-size: 0.9em;
-    font-weight: bold;
-}
-
-.day-header .date {
-    font-size: 0.8em;
-    font-weight: normal;
-}
-
-.time-slot-header {
-    background: #f0f4f8;
-    font-weight: bold;
-    color: #555;
-    text-align: center;
-}
-
-.calendar-cell {
-    position: relative;
-    padding: 8px;
-}
-
-.status-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 60px;
-    font-size: 0.8rem;
-    color: #999;
-}
-
-.status-content svg {
-    width: 24px;
-    height: 24px;
-    margin-bottom: 4px;
-}
-
-.status-content.reserved svg,
-.status-content.unavailable svg {
-    color: #E55C5C;
-}
-
-.status-content p {
-    margin: 0;
-}
-
-.closed-day .status-content svg {
-    color: #BDBDBD;
-}
-
-.slot-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    width: 100%;
-    height: 100%;
-    padding: 0;
-    position: absolute;
-    top: 0;
-    left: 0;
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.available-slot {
-    background-color: transparent;
-    color: #4AD295;
-    font-weight: bold;
-}
-
-.available-slot:hover {
-    background-color: #E0F5EE;
-    transform: scale(1.05);
-}
-
-.available-slot svg {
-    color: #4AD295;
-    width: 32px;
-    height: 32px;
-}
-
-/* モーダル */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    overflow: auto;
-}
-
-.modal-content {
-    background: #fff;
-    margin: 5% auto;
-    padding: 30px;
-    border-radius: 12px;
-    width: 500px;
-    max-width: 90%;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    animation: fadeIn 0.3s ease-out;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 15px;
-    margin-bottom: 20px;
-}
-
-.modal-header h2 {
-    font-size: 1.5rem;
-    margin: 0;
-    color: #333;
-}
-
-.close {
-    font-size: 32px;
-    font-weight: 300;
-    cursor: pointer;
-    color: #aaa;
-    transition: color 0.3s;
-}
-
-.close:hover {
-    color: #8E7CC3;
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: #555;
-}
-
-.form-select, .form-input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #E0E0E0;
-    border-radius: 8px;
-    box-sizing: border-box;
-    font-size: 1rem;
-    background-color: #FAFAFA;
-    transition: all 0.3s ease;
-}
-
-.form-select:focus, .form-input:focus {
-    outline: none;
-    border-color: #8E7CC3;
-    box-shadow: 0 0 0 2px rgba(142, 124, 195, 0.2);
-}
-
-.info-box {
-    background-color: #f8f9fa;
-    border-left: 4px solid #8E7CC3;
-    padding: 12px 15px;
-    border-radius: 8px;
-    font-weight: bold;
-    color: #333;
-}
-
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 15px;
-    margin-top: 30px;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@media (max-width: 768px) {
-    .info-grid {
-        grid-template-columns: 1fr;
-    }
-    .week-nav {
-        flex-direction: column;
-        gap: 15px;
-    }
-    .week-nav .btn {
-        width: 100%;
-        justify-content: center;
-    }
-    table {
-        font-size: 0.9em;
-    }
-    th, td {
-        padding: 8px;
-    }
-    .modal-content {
-        padding: 20px;
-    }
-}
-</style>
-
+{% block extra_js %}
 <script>
-    // CSRFトークンを取得
-    function getCSRFToken() {
-        const token = document.querySelector('[name=csrfmiddlewaretoken]');
-        return token ? token.value : '';
-    }
+document.addEventListener('DOMContentLoaded', function() {
+    // --- モバイル用 日付チップ切り替え処理 ---
+    const dateChips = document.querySelectorAll('.date-chip');
+    const panels = document.querySelectorAll('.calendar-day-panel');
 
-    function openReserveModal(date, time) {
-        // 日時を設定
+    dateChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            const dayIndex = chip.getAttribute('data-day-index');
+
+            dateChips.forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+
+            panels.forEach(p => p.classList.remove('active'));
+            document.querySelector(`.calendar-day-panel[data-day-index="${dayIndex}"]`).classList.add('active');
+        });
+    });
+
+    // --- モーダル共通処理 ---
+    const modal = document.getElementById('reserveModal');
+    const form = document.getElementById('reserveForm');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    window.openReserveModal = function(date, time) {
         document.getElementById('reserveDate').value = date;
         document.getElementById('reserveTime').value = time;
         
-        // 日時を表示用にフォーマット
         const dateObj = new Date(date + 'T' + time);
-        const options = { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric', 
-            weekday: 'long',
-            hour: '2-digit',
-            minute: '2-digit'
-        };
-        const formattedDate = dateObj.toLocaleDateString('ja-JP', options);
-        document.getElementById('reserveDateTime').textContent = formattedDate;
+        const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long', hour: '2-digit', minute: '2-digit' };
+        document.getElementById('reserveDateTime').textContent = dateObj.toLocaleDateString('ja-JP', options);
         
-        // モーダルを表示
-        document.getElementById('reserveModal').style.display = 'block';
+        modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
-    }
+    };
 
-    function closeModal() {
-        document.getElementById('reserveModal').style.display = 'none';
+    window.closeModal = function() {
+        modal.style.display = 'none';
         document.body.style.overflow = 'auto';
-    }
+    };
 
     window.onclick = function(event) {
-        const modal = document.getElementById('reserveModal');
         if (event.target === modal) {
             closeModal();
         }
-    }
+    };
 
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
@@ -542,58 +473,44 @@ thead th {
         }
     });
 
-    document.getElementById('reserveForm').onsubmit = function(e) {
+    // フォーム送信処理 (二重送信防止機能付き)
+    form.addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const submitButton = this.querySelector('.btn-primary');
-        const originalText = submitButton.textContent;
-        submitButton.disabled = true;
-        submitButton.textContent = '予約中...';
+        if (submitBtn.disabled) return;
         
-        const customerName = document.getElementById('customer_name').value.trim();
-        const menuId = document.getElementById('menu_id').value;
-        
-        if (!customerName || customerName.length > 100 || !menuId) {
-            alert('お名前とメニューを正しく入力してください。');
-            submitButton.disabled = false;
-            submitButton.textContent = originalText;
-            return;
-        }
-        
-        const formData = new FormData(this);
-        fetch(this.action, {
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = '予約処理中...';
+
+        const formData = new FormData(form);
+        const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        fetch(form.action, {
             method: 'POST',
-            headers: { 
+            headers: {
                 'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCSRFToken()
+                'X-CSRFToken': csrfToken
             },
             body: formData
         })
-        .then(response => {
-            if (response.ok) {
-                return response.json();
+        .then(response => response.json().then(data => ({ ok: response.ok, data })))
+        .then(({ ok, data }) => {
+            if (ok) {
+                alert('予約が完了しました！');
+                window.location.reload();
             } else {
-                return response.json().then(err => { throw new Error(err.error || '予約に失敗しました'); });
+                throw new Error(data.error || '不明なエラーが発生しました。');
             }
         })
-        .then(data => {
-            alert('✅ 予約が完了しました！');
-            closeModal();
-            // 予約成功後、カレンダーを再読み込みして最新の状態に
-            location.reload();
-        })
         .catch(error => {
-            console.error('予約エラー:', error);
-            alert(`❌ 予約に失敗しました: ${error.message}`);
+            alert('予約に失敗しました。\n' + error.message);
         })
         .finally(() => {
-            submitButton.disabled = false;
-            submitButton.textContent = originalText;
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
         });
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('予約カレンダーが読み込まれました');
     });
+});
 </script>
 {% endblock %}

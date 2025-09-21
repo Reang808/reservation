@@ -18,136 +18,151 @@
     <style>
         :root {
             /* 主要カラーパレット */
-            --color-primary: #8E7CC3;      /* パープル */
-            --color-secondary: #E0E0E0;    /* ライトグレー */
-            --color-success: #4AD295;      /* グリーン */
-            --color-danger: #E55C5C;       /* 赤 */
-            --color-warning: #FFC107;      /* 黄色 */
-            --color-info: #5BC0DE;         /* 水色 */
+            --color-primary: #b1b3e1ff;      /* ソフトラベンダー */
+            --color-secondary: #EAEAEA;    /* ライトグレー */
+            --color-success: #5DBE8A;      /* ソフトグリーン */
+            --color-danger: #E57373;       /* ソフトレッド */
+            --color-warning: #FFB74D;      /* ソフトオレンジ */
+            --color-info: #64B5F6;         /* ソフトブルー */
+            --color-accent: #E6D3C3;       /* ソフトベージュ */
 
-            /* グレースケール */
-            --color-black: #333333;
-            --color-dark-gray: #555555;
-            --color-medium-gray: #888888;
-            --color-light-gray: #F0F4F8;
+            /* グレースケール & テキスト */
+            --color-text: #4A4A4A;
+            --color-text-light: #7A7A7A;
+            --color-border: #E0E0E0;
+            --color-background: #FDFBFA;
             --color-white: #FFFFFF;
 
             /* シャドウ */
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.1);
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.08);
         }
         
         /* 全体スタイル */
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
         
         body { 
             font-family: 'Noto Sans JP', sans-serif; 
-            margin: 0; 
-            padding: 0;
-            background-color: var(--color-light-gray);
-            color: var(--color-black);
-            line-height: 1.7;
+            background-color: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         
         /* メインコンテナ */
         .main-container {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 24px;
         }
 
         /* カードコンポーネント */
         .card {
             background: var(--color-white);
-            border-radius: 12px;
+            border-radius: 16px;
             box-shadow: var(--shadow-md);
-            padding: 30px;
+            padding: 32px;
+            border: 1px solid var(--color-border);
         }
 
         /* ヘッダー */
         .header-nav {
-            background: linear-gradient(135deg, var(--color-primary) 0%, #6A5B9C 100%);
+            background: var(--color-primary);
             color: var(--color-white);
-            padding: 40px 20px;
-            margin-bottom: 30px;
-            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+            border-radius: 16px;
             text-align: center;
-            box-shadow: var(--shadow-lg);
         }
 
         .header-nav h1 {
             color: var(--color-white);
-            font-size: 2rem;
-            margin: 0;
+            font-size: 2.2rem;
+            margin: 0 0 8px;
             font-weight: 700;
         }
 
         .header-nav p {
-            margin: 5px 0 0;
-            font-size: 0.95rem;
-            color: rgba(255, 255, 255, 0.85);
+            margin: 0;
+            font-size: 1rem;
+            opacity: 0.9;
         }
         
         /* 見出し */
         h1, h2, h3, h4, h5, h6 {
-            color: var(--color-black);
+            color: var(--color-text);
             margin-top: 0;
+            margin-bottom: 16px;
+            font-weight: 700;
         }
         
         /* ボタン */
         .btn {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
-            padding: 12px 20px;
+            padding: 12px 24px;
             border: none;
-            border-radius: 8px;
+            border-radius: 30px;
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transition: all 0.25s ease-out;
+            box-shadow: var(--shadow-sm);
         }
         
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
         .btn-primary { background: var(--color-primary); color: white; }
-        .btn-primary:hover { background: #7A69A9; transform: translateY(-2px); }
+        .btn-primary:hover { background: #B39DD1; }
         
-        .btn-secondary { background: var(--color-secondary); color: var(--color-dark-gray); }
-        .btn-secondary:hover { background: #D3D3D3; transform: translateY(-2px); }
+        .btn-secondary { background: var(--color-secondary); color: var(--color-text-light); border: 1px solid var(--color-border); }
+        .btn-secondary:hover { background: #DDDDDD; }
         
         .btn-success { background: var(--color-success); color: white; }
-        .btn-success:hover { background: #36B880; transform: translateY(-2px); }
+        .btn-success:hover { background: #4CAF50; }
         
         .btn-danger { background: var(--color-danger); color: white; }
-        .btn-danger:hover { background: #CC4A4A; transform: translateY(-2px); }
+        .btn-danger:hover { background: #E53935; }
         
         /* テーブル */
         .table-container {
             overflow-x: auto;
+            width: 100%;
         }
 
         table { 
             border-collapse: collapse; 
             width: 100%;
             min-width: 600px;
+            background: var(--color-white);
+            border: 1px solid var(--color-border);
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            margin: 0;
         }
         
         th, td { 
-            padding: 15px; 
-            border-bottom: 1px solid #E0E0E0; 
+            padding: 16px; 
             text-align: left;
+            border-bottom: 1px solid var(--color-border);
         }
         
         th { 
-            background: var(--color-light-gray);
-            color: var(--color-dark-gray);
-            font-weight: 600;
+            background: #F9F9F9;
+            color: var(--color-text-light);
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-transform: uppercase;
         }
         
         tr:last-child td {
@@ -155,89 +170,66 @@
         }
         
         tr:hover {
-            background-color: #FAFAFA;
+            background-color: #FDFBFA;
         }
         
         /* アラートメッセージ */
         .alert {
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             gap: 12px;
+            border: 1px solid transparent;
         }
 
-        .alert p {
-            margin: 0;
-        }
-
-        .alert-success {
-            color: #1a6031;
-            background-color: #e6f6ec;
-        }
-        
-        .alert-error, .alert-danger {
-            color: #8b343c;
-            background-color: #fcebeb;
-        }
-        
-        .alert-warning {
-            color: #92753a;
-            background-color: #fff9e6;
-        }
-        
-        .alert-info {
-            color: #3b7484;
-            background-color: #e8f7fa;
-        }
-
-        .alert svg {
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
-        }
+        .alert p { margin: 0; }
+        .alert-success { color: #2e7d32; background-color: #e8f5e9; border-color: #a5d6a7; }
+        .alert-error, .alert-danger { color: #c62828; background-color: #ffcdd2; border-color: #ef9a9a; }
+        .alert-warning { color: #ef6c00; background-color: #fff3e0; border-color: #ffcc80; }
+        .alert-info { color: #0277bd; background-color: #e1f5fe; border-color: #81d4fa; }
+        .alert svg { width: 22px; height: 22px; flex-shrink: 0; }
         
         /* フォーム */
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
         
         .form-group label {
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: var(--color-dark-gray);
+            color: var(--color-text-light);
         }
         
         .form-input, .form-select, .form-textarea {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #E0E0E0;
-            border-radius: 8px;
+            padding: 14px;
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
             font-size: 1rem;
-            background-color: #FAFAFA;
-            transition: all 0.3s ease;
+            background-color: var(--color-white);
+            transition: all 0.25s ease-out;
+            color: var(--color-text);
         }
         
         .form-input:focus, .form-select:focus, .form-textarea:focus {
             outline: none;
             border-color: var(--color-primary);
-            box-shadow: 0 0 0 2px rgba(142, 124, 195, 0.2);
+            box-shadow: 0 0 0 3px rgba(195, 177, 225, 0.3);
         }
         
+        /* パンくずリスト */
         .breadcrumb {
-            background: var(--color-white);
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            padding: 0;
+            margin-bottom: 24px;
             font-size: 0.9rem;
-            color: var(--color-medium-gray);
-            box-shadow: var(--shadow-sm);
+            color: var(--color-text-light);
         }
 
         .breadcrumb a {
-            color: var(--color-dark-gray);
+            color: var(--color-text-light);
             text-decoration: none;
             transition: color 0.3s;
         }
@@ -246,26 +238,63 @@
             color: var(--color-primary);
         }
         
+        .breadcrumb span {
+            margin: 0 8px;
+        }
+
+        /* フッター */
+        .footer {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--color-border);
+            text-align: center;
+            color: var(--color-text-light);
+            font-size: 0.85rem;
+        }
+
         /* レスポンシブ対応 */
         @media (max-width: 768px) {
             .main-container {
-                padding: 10px;
+                padding: 16px;
             }
-            
             .card {
-                padding: 20px;
+                padding: 24px;
             }
-            
             .header-nav {
-                padding: 30px 15px;
+                padding: 24px;
+                margin-bottom: 24px;
             }
-            
+            .header-nav h1 {
+                font-size: 1.8rem;
+            }
             table {
                 font-size: 14px;
             }
-            
             th, td {
-                padding: 10px;
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                line-height: 1.7;
+            }
+            .main-container {
+                padding: 12px;
+            }
+            .card {
+                padding: 20px;
+            }
+            .header-nav {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+            .header-nav h1 {
+                font-size: 1.6rem;
+            }
+            .btn {
+                width: 100%;
+                padding: 14px;
             }
         }
     </style>
@@ -274,15 +303,21 @@
 </head>
 <body>
     {% if not hide_header %}
-    <div class="header-nav">
+    <header class="header-nav">
         <h1>{% block header %}🏪 予約システム{% endblock %}</h1>
         {% if user.is_authenticated %}
-            <p>ようこそ、{{ user.username|escape }}さん</p>
+            <div style="display:flex;align-items:center;gap:1em;">
+                <p style="margin:0;">ようこそ、{{ user.username|escape }}さん</p>
+                <form id="logout-form" method="post" action="{% url 'logout' %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger" onclick="return confirmLogout();">ログアウト</button>
+                </form>
+            </div>
         {% endif %}
-    </div>
+    </header>
     {% endif %}
 
-    <div class="main-container">
+    <main class="main-container">
         {% block breadcrumb %}{% endblock %}
         
         {% if messages %}
@@ -310,39 +345,40 @@
             {% endfor %}
         {% endif %}
         
-        <div class="card">
+        <article class="card">
             {% block content %}
                 <p>コンテンツがありません。</p>
             {% endblock %}
-        </div>
+        </article>
         
         {% block footer %}
-        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #E0E0E0; text-align: center; color: var(--color-medium-gray); font-size: 0.8rem;">
-            <p>© 2024 予約システム - All rights reserved.</p>
-        </div>
+        <footer class="footer">
+            <p>&copy; {% now "Y" %} 予約システム - All rights reserved.</p>
+        </footer>
         {% endblock %}
-    </div>
+    </main>
     
     {% block extra_js %}
     <script>
+        function confirmLogout() {
+            return confirm('ログアウトしてもいいですか？');
+        }
         document.addEventListener('DOMContentLoaded', function() {
             // 外部リンクにrel="noopener noreferrer"を追加
             document.querySelectorAll('a[target="_blank"]').forEach(link => {
                 link.setAttribute('rel', 'noopener noreferrer');
             });
-            
             // フォームの二重送信防止
             document.querySelectorAll('form').forEach(form => {
-                form.addEventListener('submit', function() {
+                form.addEventListener('submit', function(e) {
                     const submitBtn = this.querySelector('button[type="submit"], input[type="submit"]');
-                    if (submitBtn) {
-                        setTimeout(() => {
-                            submitBtn.disabled = true;
-                        }, 100);
+                    if (submitBtn && submitBtn.disabled) {
+                        e.preventDefault();
+                    } else if (submitBtn) {
+                        submitBtn.disabled = true;
                     }
                 });
             });
-            
             console.log('ベーステンプレートが読み込まれました');
         });
     </script>

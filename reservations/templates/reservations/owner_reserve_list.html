@@ -1,356 +1,111 @@
 {% extends 'base.html' %}
 {% block content %}
-<style>
-/* 全体のスタイル */
-body {
-    background-color: #F0F4F8; /* 落ち着いた背景色 */
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-    color: #333;
-}
-
-.container {
-    max-width: 1000px;
-    margin: 32px auto;
-    padding: 0 15px;
-}
-
-.header {
-    text-align: center;
-    margin-bottom: 24px;
-}
-
-.header h1 {
-    font-size: 1.8rem;
-    color: #333;
-    margin-bottom: 1rem;
-}
-
-.button-group {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    flex-wrap: wrap;
-}
-
-.main-content {
-    display: flex;
-    gap: 25px;
-    flex-wrap: wrap;
-}
-
-.card {
-    flex: 1 1 450px;
-    background: #fff;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05); /* 柔らかいシャドウ */
-}
-
-.card h2 {
-    font-size: 1.4rem;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #EEE;
-    padding-bottom: 10px;
-}
-
-/* ボタンのスタイル */
-.btn {
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
-    text-align: center;
-}
-
-.btn-primary {
-    background-color: #8E7CC3; /* メインカラー */
-    color: #fff;
-}
-
-.btn-primary:hover {
-    background-color: #7A69A9;
-    transform: translateY(-2px);
-}
-
-.btn-success {
-    background-color: #4AD295;
-    color: #fff;
-}
-
-.btn-success:hover {
-    background-color: #36B880;
-    transform: translateY(-2px);
-}
-
-.btn-danger {
-    background-color: #FF6B6B;
-    color: #fff;
-}
-
-.btn-danger:hover {
-    background-color: #E65A5A;
-}
-
-.btn-secondary {
-    background-color: #E0E0E0;
-    color: #555;
-}
-
-.btn-secondary:hover {
-    background-color: #D3D3D3;
-}
-
-.btn-sm {
-    padding: 6px 12px;
-    font-size: 0.9em;
-}
-
-/* テーブルのスタイル */
-.table-container {
-    overflow-x: auto;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 600px; /* PCでの表示を考慮 */
-}
-
-th, td {
-    padding: 12px 10px;
-    text-align: left;
-    border-bottom: 1px solid #E0E0E0;
-}
-
-th {
-    background-color: #F8F9FA;
-    font-weight: 600;
-    color: #555;
-    white-space: nowrap;
-}
-
-.calendar-cell {
-    text-align: center;
-    background-color: #FDFDFD;
-    transition: background-color 0.2s ease;
-}
-
-.calendar-cell:hover {
-    background-color: #F0F4F8; /* ホバー効果 */
-}
-
-.reserved {
-    background-color: #FFEBEE; /* 予約済みの背景色 */
-    border-radius: 6px;
-    padding: 5px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-}
-
-.customer-name {
-    font-weight: 600;
-}
-
-.no-data {
-    text-align: center;
-    color: #999;
-    font-style: italic;
-    padding: 20px;
-}
-
-/* モーダル */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.modal.is-visible {
-    opacity: 1;
-    visibility: visible;
-}
-
-.modal-content {
-    background-color: #fff;
-    padding: 25px 30px;
-    border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    width: 90%;
-    max-width: 400px;
-    transform: translateY(-20px);
-    transition: transform 0.3s ease;
-}
-
-.modal.is-visible .modal-content {
-    transform: translateY(0);
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.modal-header h3 {
-    font-size: 1.2rem;
-    margin: 0;
-}
-
-.modal-date-time {
-    font-weight: 600;
-    color: #888;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-}
-
-.form-group input, .form-group select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #DDD;
-    border-radius: 6px;
-    box-sizing: border-box;
-}
-
-.modal-footer {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    margin-top: 20px;
-}
-
-/* レスポンシブ対応 */
-@media (max-width: 768px) {
-    .header h1 {
-        font-size: 1.5rem;
-    }
-    .main-content {
-        flex-direction: column;
-    }
-    .card {
-        padding: 15px;
-        flex-basis: auto;
-    }
-    .card h2 {
-        font-size: 1.2rem;
-    }
-    table {
-        min-width: 100%;
-        font-size: 14px;
-    }
-    th, td {
-        padding: 8px 6px;
-    }
-    .btn {
-        font-size: 0.9em;
-        padding: 8px 15px;
-    }
-    /* iPhone SEなどの小型デバイス向け (480px以下) */
-@media (max-width: 480px) {
-    .header h1 {
-        font-size: 1.3rem;
-    }
-    .button-group {
-        flex-direction: column;
-        gap: 10px;
-    }
-    .btn {
-        width: 100%; /* ボタンを全幅表示に */
-        min-width: unset;
-        font-size: 0.9em;
-        padding: 10px 0;
-    }
-    .card {
-        padding: 10px;
-    }
-    .calendar-cell {
-        padding: 6px 4px; /* セルのパディングをさらに縮小 */
-    }
-    .reserved {
-        font-size: 0.8em; /* 予約済みテキストを小さく */
-        padding: 3px;
-    }
-    .btn-sm {
-        padding: 4px 8px; /* 小さなボタンのサイズ調整 */
-    }
-    .modal-content {
-        padding: 20px;
-    }
-}
-</style>
-<div class="container">
+<div class="container owner-management-page">
     <div class="header">
         <h1>{{ tenant.name }} 予約管理</h1>
         <div class="button-group">
             <a href="{% url 'owner_menu_list_by_tenant' tenant.slug %}" class="btn btn-primary">メニュー管理</a>
-            <a href="{% url 'owner_reserve_list_by_tenant' tenant.slug %}" class="btn btn-primary">予約カレンダー</a>
+            {# このページのURLなのでボタンは非表示にするか、別のページへのリンクにします #}
+            {# <a href="{% url 'owner_reserve_list_by_tenant' tenant.slug %}" class="btn btn-primary">予約カレンダー</a> #}
         </div>
     </div>
     <div class="main-content">
         <div class="card calendar-card">
-            <h2>カレンダー</h2>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>時間＼日付</th>
-                            {% for day in week_days %}
-                            <th>{{ day|date:'m/d' }}</th>
+            <div class="calendar-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+                <form method="get" style="margin:0;">
+                    <input type="hidden" name="week_offset" value="{{ week_offset|add:'-1' }}">
+                    <button type="submit" class="btn btn-secondary btn-sm">← 前週</button>
+                </form>
+                <h2 style="margin:0;flex:1;text-align:center;min-width:120px;">予約カレンダー</h2>
+                <form method="get" style="margin:0;">
+                    <input type="hidden" name="week_offset" value="{{ week_offset|add:'1' }}">
+                    <button type="submit" class="btn btn-secondary btn-sm">次週 →</button>
+                </form>
+            </div>
+            
+            <div class="desktop-calendar">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="time-header">時間</th>
+                                {% for day in week_days %}
+                                <th class="day-header">{{ day|date:'m/d' }}<br><span class="day-of-week">{{ day|date:'D' }}</span></th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in calendar_rows %}
+                            <tr>
+                                <td class="time-header">{{ row.0.slot|time:'H:i' }}</td>
+                                {% for cell in row %}
+                                <td class="calendar-cell">
+                                    {% if cell.reservation %}
+                                    <div class="reserved-slot">
+                                        <span class="customer-name">{{ cell.reservation.customer_name|escape }}</span>
+                                        <form method="post" action="{% url 'owner_reserve_delete' cell.reservation.id %}" class="delete-form">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('本当に削除しますか？');">削除</button>
+                                        </form>
+                                    </div>
+                                    {% else %}
+                                    <button class="btn btn-success btn-sm" onclick="showAddForm('{{ cell.day|date:'Y-m-d' }}','{{ cell.slot|time:'H:i' }}')">＋</button>
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
                             {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for row in calendar_rows %}
-                        <tr>
-                            <td>{{ row.0.slot|time:'H:i' }}</td>
-                            {% for cell in row %}
-                            <td class="calendar-cell">
-                                {% if cell.reservation %}
-                                <div class="reserved">
-                                    <span class="customer-name">{{ cell.reservation.customer_name|escape }}</span>
-                                    <form method="post" style="display:inline;">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="action" value="delete">
-                                        <input type="hidden" name="reserve_id" value="{{ cell.reservation.id }}">
-                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('本当に削除しますか？');">削除</button>
-                                    </form>
-                                </div>
-                                {% else %}
-                                <button class="btn btn-success btn-sm" onclick="showAddForm('{{ cell.day|date:'Y-m-d' }}','{{ cell.slot|time:'H:i' }}')">＋</button>
-                                {% endif %}
-                            </td>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mobile-calendar">
+                <div class="date-selector">
+                    {% for day in week_days %}
+                    <div class="date-chip {% if forloop.first %}active{% endif %}" data-day-index="{{ forloop.counter0 }}">
+                        <span class="chip-day">{{ day|date:"D" }}</span>
+                        <span class="chip-date">{{ day|date:"j" }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="calendar-panels">
+                    {% for day in week_days %}
+                    <div class="calendar-day-panel {% if forloop.first %}active{% endif %}" data-day-index="{{ forloop.counter0 }}">
+                        <ul class="slot-list">
+                            {% for row in calendar_rows %}
+                                {% for cell in row %}
+                                    {% if forloop.counter0 == forloop.parentloop.parentloop.counter0 %}
+                                    <li class="slot-item">
+                                        <div class="slot-time">{{ cell.slot|time:"H:i" }}</div>
+                                        <div class="slot-status">
+                                            {% if cell.reservation %}
+                                                <div class="reserved-info">
+                                                    <span class="customer-name">{{ cell.reservation.customer_name|escape }}</span>
+                                                    <form method="post" action="{% url 'owner_reserve_delete' cell.reservation.id %}" class="delete-form">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('本当にこの予約を削除しますか？');">削除</button>
+                                                    </form>
+                                                </div>
+                                            {% else %}
+                                                <button type="button" class="btn btn-success" onclick="showAddForm('{{ cell.day|date:'Y-m-d' }}','{{ cell.slot|time:'H:i' }}')">追加</button>
+                                            {% endif %}
+                                        </div>
+                                    </li>
+                                    {% endif %}
+                                {% endfor %}
                             {% endfor %}
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </ul>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
+
         <div class="card list-card">
             <h2>予約一覧</h2>
-            <div class="table-container">
+            <!-- PC/タブレット: テーブル表示 -->
+            <div class="table-container reservation-table">
                 <table>
                     <thead>
                         <tr>
@@ -363,8 +118,8 @@ th {
                     <tbody>
                         {% for r in reservations %}
                         <tr>
-                            <td>{{ r.date }}</td>
-                            <td>{{ r.time_slot }}</td>
+                            <td>{{ r.date|date:"m/d" }}</td>
+                            <td>{{ r.time_slot|time:"H:i" }}</td>
                             <td>{% if r.menu %}{{ r.menu.name|escape }}{% endif %}</td>
                             <td>{{ r.customer_name|escape }}</td>
                         </tr>
@@ -375,6 +130,19 @@ th {
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
+            <!-- スマホ: カード型リスト表示 -->
+            <div class="reservation-cards">
+                {% for r in reservations %}
+                <div class="reservation-card">
+                    <div class="rc-row rc-date"><span class="rc-label">日付</span><span class="rc-value">{{ r.date|date:"m/d" }}</span></div>
+                    <div class="rc-row rc-time"><span class="rc-label">時間</span><span class="rc-value">{{ r.time_slot|time:"H:i" }}</span></div>
+                    <div class="rc-row rc-menu"><span class="rc-label">メニュー</span><span class="rc-value">{% if r.menu %}{{ r.menu.name|escape }}{% endif %}</span></div>
+                    <div class="rc-row rc-customer"><span class="rc-label">顧客名</span><span class="rc-value">{{ r.customer_name|escape }}</span></div>
+                </div>
+                {% empty %}
+                <div class="no-data">予約はありません</div>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -393,13 +161,17 @@ th {
             </div>
             <div class="form-group">
                 <label for="menu">メニュー:</label>
-                <select id="menu" name="menu_id">
+                <select id="menu" name="menu_id" class="form-control">
                     {% for m in menus %}<option value="{{ m.id }}">{{ m.name }}</option>{% endfor %}
                 </select>
             </div>
             <div class="form-group">
                 <label for="customer_name">顧客名:</label>
-                <input type="text" id="customer_name" name="customer_name" required>
+                <input type="text" id="customer_name" name="customer_name" class="form-control" required>
+            </div>
+             <div class="form-group">
+                <label for="customer_phone">電話番号:</label>
+                <input type="tel" id="customer_phone" name="customer_phone" class="form-control" required>
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-primary">予約追加</button>
@@ -409,16 +181,248 @@ th {
     </div>
 </div>
 
+<style>
+/* モーダルの幅をスマホでも広く */
+.modal-content {
+    width: 90vw;
+    max-width: 400px;
+    min-width: 200px;
+    margin: 0 auto;
+}
+/* セレクトボックスの最小幅を確保 */
+select.form-control {
+    min-width: 150px;
+}
+/* --- 予約一覧カード型リスト --- */
+.reservation-cards {
+    display: none;
+    gap: 12px;
+    flex-direction: column;
+    margin-top: 8px;
+}
+.reservation-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.rc-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1em;
+    padding: 2px 0;
+}
+.rc-label {
+    color: #888;
+    font-size: 0.97em;
+    min-width: 60px;
+}
+.rc-value {
+    font-weight: 600;
+    color: #333;
+    text-align: right;
+}
+/* --- 基本スタイル --- */
+body {
+    background-color: #F0F4F8;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    color: #333;
+}
+.container { max-width: 1200px; margin: 32px auto; padding: 0 15px; }
+.header { text-align: center; margin-bottom: 24px; }
+.header h1 { font-size: 1.8rem; color: #333; margin-bottom: 1rem; }
+.button-group { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+
+/* --- メインレイアウト --- */
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+.calendar-card, .list-card {
+    width: 100%;
+    min-width: 0;
+}
+
+.card { background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+.card h2 { font-size: 1.4rem; margin: 0 0 20px 0; border-bottom: 2px solid #EEE; padding-bottom: 10px; }
+
+/* --- ボタン --- */
+.btn {
+    padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none;
+    transition: all 0.3s ease; border: none; cursor: pointer; text-align: center;
+}
+.btn-primary { background-color: #8E7CC3; color: #fff; }
+.btn-primary:hover { background-color: #7A69A9; transform: translateY(-2px); }
+.btn-success { background-color: #4AD295; color: #fff; }
+.btn-success:hover { background-color: #36B880; transform: translateY(-2px); }
+.btn-danger { background-color: #FF6B6B; color: #fff; }
+.btn-danger:hover { background-color: #E65A5A; }
+.btn-secondary { background-color: #E0E0E0; color: #555; }
+.btn-secondary:hover { background-color: #D3D3D3; }
+.btn-sm { padding: 4px 10px; font-size: 0.9em; }
+
+/* --- テーブル共通 --- */
+.table-container { overflow-x: auto; width: 100%; }
+table { width: 100%; min-width: 480px; border-collapse: collapse; }
+th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #E0E0E0; word-break: break-word; }
+th { background-color: #F8F9FA; font-weight: 600; color: #555; white-space: nowrap; }
+.no-data { text-align: center; color: #999; padding: 20px; }
+
+/* --- PC用カレンダー --- */
+.desktop-calendar { display: block; }
+.day-header { text-align: center; }
+.day-of-week { font-size: 0.8em; color: #777; }
+.time-header { font-weight: 600; text-align: center; }
+.calendar-cell { text-align: center; vertical-align: middle; }
+.reserved-slot {
+    background-color: #FFEBEE; border-radius: 6px; padding: 5px;
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+}
+.customer-name { font-weight: 600; font-size: 0.9em; }
+.delete-form { margin: 0; }
+
+/* --- スマートフォン用カレンダー --- */
+.mobile-calendar { display: none; }
+.date-selector { display: flex; justify-content: space-around; gap: 6px; margin-bottom: 20px; }
+.date-chip {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    flex-grow: 1; padding: 8px 4px; border: 1px solid var(--color-border, #E0E0E0);
+    border-radius: 10px; cursor: pointer; transition: all 0.2s ease-in-out;
+}
+.date-chip:hover { background-color: #f7f5fb; }
+.date-chip.active {
+    background-color: var(--color-primary, #8E7CC3); color: white; border-color: var(--color-primary, #8E7CC3);
+    transform: translateY(-2px); box-shadow: var(--shadow-sm, 0 2px 4px rgba(0,0,0,0.05));
+}
+.date-chip .chip-day { font-size: 0.75rem; }
+.date-chip .chip-date { font-size: 1rem; font-weight: 500; margin-top: 2px; }
+.date-chip.active .chip-day, .date-chip.active .chip-date { color: white; }
+
+.calendar-day-panel { display: none; }
+.calendar-day-panel.active { display: block; }
+
+.slot-list { list-style: none; padding: 0; margin: 0; }
+.slot-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #E0E0E0; }
+.slot-item:last-child { border-bottom: none; }
+.slot-time { font-weight: 600; width: 70px; flex-shrink: 0; }
+.slot-status { flex-grow: 1; }
+.reserved-info { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+
+/* --- モーダル --- */
+.modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center;
+    opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; z-index: 1000;
+}
+.modal.is-visible { opacity: 1; visibility: visible; }
+.modal-content {
+    background-color: #fff; padding: 25px 30px; border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1); width: 90%; max-width: 450px;
+    transform: translateY(-20px); transition: transform 0.3s ease;
+}
+.modal.is-visible .modal-content { transform: translateY(0); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.modal-header h3 { font-size: 1.2rem; margin: 0; }
+.modal-date-time { font-weight: 600; color: #777; font-size: 0.95em; }
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 0.9em; }
+.form-control {
+    width: 100%; padding: 10px; border: 1px solid #DDD;
+    border-radius: 6px; box-sizing: border-box; font-size: 1em;
+}
+.modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+/* --- レスポンシブ --- */
+@media (max-width: 992px) {
+    .main-content {
+        gap: 0;
+    }
+    .card { flex-basis: auto; width: 100%; min-width: 0; }
+}
+
+@media (max-width: 768px) {
+    .desktop-calendar { display: none; }
+    .mobile-calendar { display: block; }
+    .header h1 { font-size: 1.5rem; }
+    .card { padding: 10px; }
+    .card h2 { font-size: 1.1rem; }
+    .btn { font-size: 0.9em; padding: 8px 12px; }
+    .list-card .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 -10px;
+    }
+    .list-card table {
+        min-width: 400px;
+        font-size: 0.95em;
+    }
+    th, td {
+        padding: 8px 6px;
+        font-size: 0.95em;
+    }
+}
+
+@media (max-width: 480px) {
+    .header h1 { font-size: 1.1rem; }
+    .button-group { flex-direction: column; gap: 8px; }
+    .btn { width: 100%; }
+    .card { padding: 6px; }
+    .list-card .reservation-table { display: none; }
+    .reservation-cards { display: flex; }
+    .list-card .table-container {
+        margin: 0;
+    }
+}
+</style>
+
 <script>
-    function showAddForm(date, time) {
-        document.getElementById('add-date').value = date;
-        document.getElementById('add-time-slot').value = time;
-        document.getElementById('add-date-label').innerText = date;
-        document.getElementById('add-time-label').innerText = time;
-        document.getElementById('add-form-modal').classList.add('is-visible');
+// --- モーダル表示/非表示 ---
+function showAddForm(date, time) {
+    document.getElementById('add-date').value = date;
+    document.getElementById('add-time-slot').value = time;
+    document.getElementById('add-date-label').innerText = date;
+    document.getElementById('add-time-label').innerText = time;
+    document.getElementById('add-form-modal').classList.add('is-visible');
+}
+function hideAddForm() {
+    document.getElementById('add-form-modal').classList.remove('is-visible');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // --- モバイル用 日付チップ切り替え ---
+    const dateChips = document.querySelectorAll('.date-chip');
+    const panels = document.querySelectorAll('.calendar-day-panel');
+    if(dateChips.length > 0) {
+        dateChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                const dayIndex = chip.getAttribute('data-day-index');
+                dateChips.forEach(c => c.classList.remove('active'));
+                panels.forEach(p => p.classList.remove('active'));
+                chip.classList.add('active');
+                const activePanel = document.querySelector(`.calendar-day-panel[data-day-index="${dayIndex}"]`);
+                if (activePanel) {
+                    activePanel.classList.add('active');
+                }
+            });
+        });
     }
-    function hideAddForm() {
-        document.getElementById('add-form-modal').classList.remove('is-visible');
+
+    // --- モーダルの外側クリックで閉じる ---
+    const modal = document.getElementById('add-form-modal');
+    if(modal) {
+        modal.addEventListener('click', function(event) {
+            if (event.target === this) {
+                hideAddForm();
+            }
+        });
     }
+});
 </script>
 {% endblock %}
