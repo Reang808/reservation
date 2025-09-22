@@ -23,14 +23,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
-# 'django-insecure-ci^#s3(v54#teb63ha-#nvoo@h_#8m)z@+cva13%!f@7k4xo$^'
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-ci^#s3(v54#teb63ha-#nvoo@h_#8m)z@+cva13%!f@7k4xo$^')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = True
+# config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['reang-reserve.jp', 'www.reang-reserve.jp', '163.44.123.195',]
-# '127.0.0.1:8000', '127.0.0.1', 'localhost'
+ALLOWED_HOSTS = ['reang-reserve.jp', 'www.reang-reserve.jp', '163.44.123.195', '127.0.0.1:8000', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -138,4 +137,5 @@ AUTH_USER_MODEL = 'reservations.CustomUser'
 # Twilio SMS settings（本番用は環境変数やSecret管理推奨）
 TWILIO_ACCOUNT_SID = 'your_account_sid_here'
 TWILIO_AUTH_TOKEN = 'your_auth_token_here'
+TWILIO_FROM_NUMBER = '+819012345678'  # Twilioで取得した電話番号
 TWILIO_FROM_NUMBER = '+819012345678'  # Twilioで取得した電話番号
