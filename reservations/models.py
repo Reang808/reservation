@@ -59,6 +59,64 @@ class Tenant(models.Model):
     saturday_open = models.BooleanField(default=True, verbose_name='土曜日営業')
     sunday_open = models.BooleanField(default=True, verbose_name='日曜日営業')
     
+    # メール通知設定
+    notification_email = models.EmailField(
+        '通知先メールアドレス',
+        blank=True,
+        null=True,
+        help_text='予約通知を受け取るメールアドレス（空の場合はオーナーのメールアドレスを使用）'
+    )
+    
+    # 顧客向けメール設定
+    customer_email_subject = models.CharField(
+        '予約確認メール件名',
+        max_length=200,
+        default='【予約確認】{店舗名}のご予約が完了しました',
+        help_text='{店舗名}、{お客様名}、{予約日時}が使用できます'
+    )
+    
+    customer_email_message = models.TextField(
+        '予約確認メール本文',
+        default='''{お客様名} 様
+
+{店舗名}のご予約が完了いたしました。
+
+■予約詳細
+予約日時: {予約日時}
+お名前: {お客様名}
+電話番号: {電話番号}
+
+何かご不明な点がございましたら、お気軽にお問い合わせください。
+お客様のご来店を心よりお待ちしております。
+
+{店舗名}''',
+        help_text='使用可能な変数: {店舗名}、{お客様名}、{予約日時}、{電話番号}、{メールアドレス}'
+    )
+    
+    # 事業者向けメール設定
+    owner_email_subject = models.CharField(
+        '予約通知メール件名',
+        max_length=200,
+        default='【新規予約】{お客様名}様からご予約がありました',
+        help_text='{店舗名}、{お客様名}、{予約日時}が使用できます'
+    )
+    
+    owner_email_message = models.TextField(
+        '予約通知メール本文',
+        default='''{店舗名} 様
+
+新しいご予約が入りました。
+
+■予約詳細
+お客様名: {お客様名}
+予約日時: {予約日時}
+電話番号: {電話番号}
+メールアドレス: {メールアドレス}
+
+管理画面で詳細をご確認ください。''',
+        help_text='使用可能な変数: {店舗名}、{お客様名}、{予約日時}、{電話番号}、{メールアドレス}'
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='作成日時')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='更新日時')
     
@@ -139,6 +197,7 @@ class Reservation(models.Model):
     menu = models.ForeignKey(Menu, on_delete=models.SET_NULL, null=True, blank=True, related_name='reservations', verbose_name='メニュー')
     customer_name = models.CharField(max_length=100, verbose_name='顧客名')
     customer_phone = models.CharField(max_length=20, verbose_name='電話番号', default='', blank=True)
+    customer_email = models.EmailField('顧客メールアドレス', blank=True, null=True, help_text='予約確認メール送信用')
     date = models.DateField(verbose_name='予約日')
     time_slot = models.TimeField(verbose_name='予約時間')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='予約作成日時')
@@ -157,6 +216,7 @@ class Reservation(models.Model):
         """予約のバリデーション"""
         super().clean()
         from datetime import datetime, timedelta
+        from django.utils import timezone
         
         # 過去の日付への予約を防ぐ
         today = datetime.now().date()
@@ -166,10 +226,35 @@ class Reservation(models.Model):
         # メニューとテナントの整合性チェック
         if self.menu and self.menu.tenant != self.tenant:
             raise ValidationError('選択されたメニューはこのテナントのものではありません。')
+        
+        # 予約時間帯のバリデーション
+        if self.time_slot and self.tenant:
+            # 営業終了時間を過ぎる予約はできない
+            end_time = datetime.combine(self.date, self.tenant.end_time)
+            reservation_time = datetime.combine(self.date, self.time_slot)
+            if reservation_time >= end_time:
+                raise ValidationError('営業終了時間を過ぎる予約はできません。')
+        
+        # 予約可能時間のバリデーション
+        if self.tenant and self.date:
+            now = timezone.now()
+            reservation_datetime = timezone.make_aware(datetime.combine(self.date, self.time_slot))
+            advance_time = timedelta(hours=self.tenant.advance_hours)
+            if reservation_datetime < now + advance_time:
+                raise ValidationError(f"現在時刻から{self.tenant.advance_hours}時間後以降で予約してください。")
     
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
     
+    def __str__(self):
+        return f"{self.customer_name} - {self.tenant.name} ({self.date} {self.time_slot})"
+    
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"{self.customer_name} - {self.tenant.name} ({self.date} {self.time_slot})"
     def __str__(self):
         return f"{self.tenant.name} {self.date} {self.time_slot} {self.customer_name}"

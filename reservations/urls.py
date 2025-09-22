@@ -29,6 +29,7 @@ urlpatterns = [
     # 事業者専用 - テナント指定（推奨）
     path('owner/tenant/<slug:tenant_slug>/reserve/', views_owner.owner_reserve_list_by_tenant, name='owner_reserve_list_by_tenant'),
     path('owner/tenant/<slug:tenant_slug>/menu/', views_menu_owner.owner_menu_list_by_tenant, name='owner_menu_list_by_tenant'),
+    path('owner/tenant/<slug:tenant_slug>/email-settings/', views_owner.owner_email_settings, name='owner_email_settings'),
     
     # 非推奨/削除予定（セキュリティ上問題のあるパターン）
     # path('calendar/', views.calendar_view, name='calendar'),  # tenant_slug不要のため削除

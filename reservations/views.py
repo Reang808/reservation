@@ -122,6 +122,7 @@ def reserve_slot(request, tenant_slug=None):
     time_str = request.POST.get('time_slot', '').strip()
     menu_id = request.POST.get('menu_id', '').strip()
     customer_name = request.POST.get('customer_name', '').strip()
+    customer_email = request.POST.get('customer_email', '').strip()
     customer_phone = request.POST.get('customer_phone', '').strip()
     
     # バリデーション
@@ -151,13 +152,16 @@ def reserve_slot(request, tenant_slug=None):
                 tenant=tenant,
                 menu=menu,
                 customer_name=customer_name[:100],  # 長さ制限
+                customer_email=customer_email,
                 customer_phone=customer_phone[:20],
                 date=reserve_date,
                 time_slot=reserve_time
             )
-            # 顧客へSMS通知
+            
+            # 顧客へSMS通知（既存機能維持）
             sms_msg = f"{tenant.name}のご予約が完了しました。\n日時: {reserve_date} {reserve_time.strftime('%H:%M')}\nお名前: {customer_name}"
             send_sms(customer_phone, sms_msg)
+
             # 事業者へSMS通知（オーナーの電話番号があれば）
             owner_phone = getattr(tenant.owner, 'phone', None)
             if owner_phone:

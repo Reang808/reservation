@@ -26,10 +26,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-ci^#s3(v54#teb63ha-#nvoo@h_#8m)z@+cva13%!f@7k4xo$^')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-# config('DEBUG', default=False, cast=bool)
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['reang-reserve.jp', 'www.reang-reserve.jp', '163.44.123.195', '127.0.0.1:8000', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['reang-reserve.jp', 'www.reang-reserve.jp', '163.44.123.195',]
+# '127.0.0.1:8000', '127.0.0.1', 'localhost'
 
 
 # Application definition
@@ -60,7 +60,7 @@ ROOT_URLCONF = 'tenant_reservation.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'reservations' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -134,8 +134,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # カスタムユーザーモデル
 AUTH_USER_MODEL = 'reservations.CustomUser'
 
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Gmailの場合
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='info@reang.jp')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='mrqy oaey pfwa eaok')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='info@reang.jp')
+
+# 予約通知設定
+ENABLE_RESERVATION_NOTIFICATIONS = config('ENABLE_RESERVATION_NOTIFICATIONS', default=True, cast=bool)
+
 # Twilio SMS settings（本番用は環境変数やSecret管理推奨）
 TWILIO_ACCOUNT_SID = 'your_account_sid_here'
 TWILIO_AUTH_TOKEN = 'your_auth_token_here'
-TWILIO_FROM_NUMBER = '+819012345678'  # Twilioで取得した電話番号
 TWILIO_FROM_NUMBER = '+819012345678'  # Twilioで取得した電話番号

@@ -83,6 +83,7 @@ def owner_reserve_list_by_tenant(request, tenant_slug):
         time_str = request.POST.get('time_slot', '').strip()
         menu_id = request.POST.get('menu_id', '').strip()
         customer_name = request.POST.get('customer_name', '').strip()
+        customer_email = request.POST.get('customer_email', '').strip()
         customer_phone = request.POST.get('customer_phone', '').strip()
         
         try:
@@ -114,12 +115,13 @@ def owner_reserve_list_by_tenant(request, tenant_slug):
                 tenant=tenant,
                 menu=menu,
                 customer_name=customer_name,
+                customer_email=customer_email,
                 customer_phone=customer_phone,
                 date=reserve_date,
                 time_slot=reserve_time
             )
             
-            messages.success(request, '予約を追加しました。')
+            messages.success(request, '予約を追加し、確認メールを送信しました。')
             logger.info(f"Reservation created by user {request.user.id} for tenant {tenant.slug}")
             
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -286,14 +288,35 @@ def owner_reserve_calendar(request):
         time_slot = request.POST.get('time_slot')
         menu_id = request.POST.get('menu_id')
         customer_name = request.POST.get('customer_name')
-        slot_time = datetime.strptime(time_slot, '%H:%M').time()
-        exists = Reservation.objects.filter(tenant=tenant, date=date, time_slot=slot_time).exists()
-        if not exists:
-            menu = Menu.objects.filter(id=menu_id, tenant=tenant).first() if menu_id else None
-            Reservation.objects.create(
-                tenant=tenant, menu=menu, customer_name=customer_name, date=date, time_slot=slot_time
-            )
+        customer_email = request.POST.get('customer_email', '')
+        customer_phone = request.POST.get('customer_phone', '')
+        
+        try:
+            slot_time = datetime.strptime(time_slot, '%H:%M').time()
+            exists = Reservation.objects.filter(tenant=tenant, date=date, time_slot=slot_time).exists()
+            
+            if not exists:
+                menu = Menu.objects.filter(id=menu_id, tenant=tenant).first() if menu_id else None
+                
+                Reservation.objects.create(
+                    tenant=tenant,
+                    menu=menu,
+                    customer_name=customer_name,
+                    customer_email=customer_email,
+                    customer_phone=customer_phone,
+                    date=date,
+                    time_slot=slot_time
+                )
+                messages.success(request, '予約を追加しました。')
+            else:
+                messages.error(request, 'この時間枠は既に予約済みです。')
+                
+        except Exception as e:
+            logger.error(f"Error creating reservation: {str(e)}")
+            messages.error(request, '予約の作成に失敗しました。')
+            
         return redirect('owner_reserve_calendar')
+    
     context = {
         'tenant': tenant,
         'week_days': week_days,
@@ -360,14 +383,35 @@ def owner_reserve_list(request):
         time_slot = request.POST.get('time_slot')
         menu_id = request.POST.get('menu_id')
         customer_name = request.POST.get('customer_name')
-        slot_time = datetime.strptime(time_slot, '%H:%M').time()
-        exists = Reservation.objects.filter(tenant=tenant, date=date, time_slot=slot_time).exists()
-        if not exists:
-            menu = Menu.objects.filter(id=menu_id, tenant=tenant).first() if menu_id else None
-            Reservation.objects.create(
-                tenant=tenant, menu=menu, customer_name=customer_name, date=date, time_slot=slot_time
-            )
+        customer_email = request.POST.get('customer_email', '')
+        customer_phone = request.POST.get('customer_phone', '')
+        
+        try:
+            slot_time = datetime.strptime(time_slot, '%H:%M').time()
+            exists = Reservation.objects.filter(tenant=tenant, date=date, time_slot=slot_time).exists()
+            
+            if not exists:
+                menu = Menu.objects.filter(id=menu_id, tenant=tenant).first() if menu_id else None
+                
+                Reservation.objects.create(
+                    tenant=tenant,
+                    menu=menu,
+                    customer_name=customer_name,
+                    customer_email=customer_email,
+                    customer_phone=customer_phone,
+                    date=date,
+                    time_slot=slot_time
+                )
+                messages.success(request, '予約を追加しました。')
+            else:
+                messages.error(request, 'この時間枠は既に予約済みです。')
+                
+        except Exception as e:
+            logger.error(f"Error creating reservation: {str(e)}")
+            messages.error(request, '予約の作成に失敗しました。')
+            
         return redirect('owner_reserve_list')
+    
     # 予約削除
     if request.method == 'POST' and request.POST.get('action') == 'delete':
         reserve_id = request.POST.get('reserve_id')
@@ -386,3 +430,43 @@ def owner_reserve_list(request):
         'reservations': all_reservations,
     }
     return render(request, 'reservations/owner_reserve_list.html', context)
+
+@tenant_owner_required
+def owner_email_settings(request, tenant_slug):
+    """メール設定画面"""
+    tenant = get_object_or_404(Tenant, slug=tenant_slug)
+    
+    if request.method == 'POST':
+        try:
+            # フォームデータの取得と保存
+            tenant.notification_email = request.POST.get('notification_email', '').strip()
+            tenant.customer_email_subject = request.POST.get('customer_email_subject', '').strip()
+            tenant.customer_email_message = request.POST.get('customer_email_message', '').strip()
+            tenant.owner_email_subject = request.POST.get('owner_email_subject', '').strip()
+            tenant.owner_email_message = request.POST.get('owner_email_message', '').strip()
+            
+            # バリデーション
+            if not tenant.customer_email_subject:
+                raise ValidationError('予約確認メール件名は必須です。')
+            if not tenant.customer_email_message:
+                raise ValidationError('予約確認メール本文は必須です。')
+            if not tenant.owner_email_subject:
+                raise ValidationError('予約通知メール件名は必須です。')
+            if not tenant.owner_email_message:
+                raise ValidationError('予約通知メール本文は必須です。')
+            
+            tenant.save()
+            messages.success(request, 'メール設定を保存しました。')
+            
+        except ValidationError as e:
+            messages.error(request, str(e))
+        except Exception as e:
+            logger.error(f"Error saving email settings: {str(e)}")
+            messages.error(request, 'メール設定の保存に失敗しました。')
+        
+        return redirect('owner_email_settings', tenant_slug=tenant.slug)
+    
+    context = {
+        'tenant': tenant,
+    }
+    return render(request, 'reservations/owner_email_settings.html', context)

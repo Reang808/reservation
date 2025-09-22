@@ -1,0 +1,166 @@
+<!-- filepath: /Users/pc/Documents/project/LINE/reservations/templates/reservations/owner_email_settings.html -->
+{% extends 'base.html' %}
+{% block content %}
+<div class="container form-container">
+    <div class="card form-card">
+        <h2 class="form-title">{{ tenant.name }} メール設定</h2>
+        
+        <div class="help-section">
+            <h3>💡 使用可能な変数</h3>
+            <div class="variable-tags">
+                <span class="tag">{店舗名}</span>
+                <span class="tag">{お客様名}</span>
+                <span class="tag">{予約日時}</span>
+                <span class="tag">{電話番号}</span>
+                <span class="tag">{メールアドレス}</span>
+            </div>
+        </div>
+        
+        <form method="post" class="styled-form">
+            {% csrf_token %}
+            
+            <div class="section">
+                <h3 class="section-title">📧 通知設定</h3>
+                <div class="form-group">
+                    <label for="notification_email">通知先メールアドレス:</label>
+                    <input type="email" name="notification_email" id="notification_email" 
+                           value="{{ tenant.notification_email|default:'' }}" 
+                           placeholder="空の場合はオーナーのメールアドレスを使用">
+                    <small class="help-text">予約通知を受け取るメールアドレス</small>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3 class="section-title">👤 お客様向けメール設定</h3>
+                <div class="form-group">
+                    <label for="customer_email_subject">予約確認メール件名:</label>
+                    <input type="text" name="customer_email_subject" id="customer_email_subject" 
+                           value="{{ tenant.customer_email_subject }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="customer_email_message">予約確認メール本文:</label>
+                    <textarea name="customer_email_message" id="customer_email_message" 
+                              rows="10" required>{{ tenant.customer_email_message }}</textarea>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3 class="section-title">🏪 事業者向けメール設定</h3>
+                <div class="form-group">
+                    <label for="owner_email_subject">予約通知メール件名:</label>
+                    <input type="text" name="owner_email_subject" id="owner_email_subject" 
+                           value="{{ tenant.owner_email_subject }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="owner_email_message">予約通知メール本文:</label>
+                    <textarea name="owner_email_message" id="owner_email_message" 
+                              rows="8" required>{{ tenant.owner_email_message }}</textarea>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">設定を保存</button>
+                <a href="{% url 'owner_reserve_list_by_tenant' tenant.slug %}" class="btn btn-secondary">戻る</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+/* ...existing code... */
+
+.help-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+    border-left: 4px solid #8E7CC3;
+}
+
+.help-section h3 {
+    margin: 0 0 12px 0;
+    font-size: 1rem;
+    color: #333;
+}
+
+.variable-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag {
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-family: monospace;
+}
+
+.section {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.section:last-of-type {
+    border-bottom: none;
+}
+
+.section-title {
+    font-size: 1.2rem;
+    margin: 0 0 16px 0;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+
+.form-group {
+    margin-bottom: 18px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #E0E0E0;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    background-color: #FAFAFA;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #8E7CC3;
+    box-shadow: 0 0 0 2px rgba(142, 124, 195, 0.2);
+}
+
+.help-text {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* ...existing code... */
+</style>
+{% endblock %}

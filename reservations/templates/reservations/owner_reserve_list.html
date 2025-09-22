@@ -5,6 +5,7 @@
         <h1>{{ tenant.name }} 予約管理</h1>
         <div class="button-group">
             <a href="{% url 'owner_menu_list_by_tenant' tenant.slug %}" class="btn btn-primary">メニュー管理</a>
+             <a href="{% url 'owner_email_settings' tenant.slug %}" class="btn btn-primary">メール設定</a>
             {# このページのURLなのでボタンは非表示にするか、別のページへのリンクにします #}
             {# <a href="{% url 'owner_reserve_list_by_tenant' tenant.slug %}" class="btn btn-primary">予約カレンダー</a> #}
         </div>
@@ -104,6 +105,7 @@
 
         <div class="card list-card">
             <h2>予約一覧</h2>
+
             <!-- PC/タブレット: テーブル表示 -->
             <div class="table-container reservation-table">
                 <table>
@@ -113,6 +115,8 @@
                             <th>時間</th>
                             <th>メニュー</th>
                             <th>顧客名</th>
+                            <th>メールアドレス</th>
+                            <th>電話番号</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -122,10 +126,12 @@
                             <td>{{ r.time_slot|time:"H:i" }}</td>
                             <td>{% if r.menu %}{{ r.menu.name|escape }}{% endif %}</td>
                             <td>{{ r.customer_name|escape }}</td>
+                            <td>{{ r.customer_email|default:'-'|escape }}</td>
+                            <td>{{ r.customer_phone|escape }}</td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="4" class="no-data">予約はありません</td>
+                            <td colspan="6" class="no-data">予約はありません</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -139,6 +145,8 @@
                     <div class="rc-row rc-time"><span class="rc-label">時間</span><span class="rc-value">{{ r.time_slot|time:"H:i" }}</span></div>
                     <div class="rc-row rc-menu"><span class="rc-label">メニュー</span><span class="rc-value">{% if r.menu %}{{ r.menu.name|escape }}{% endif %}</span></div>
                     <div class="rc-row rc-customer"><span class="rc-label">顧客名</span><span class="rc-value">{{ r.customer_name|escape }}</span></div>
+                    <div class="rc-row rc-email"><span class="rc-label">メール</span><span class="rc-value">{{ r.customer_email|default:'-'|escape }}</span></div>
+                    <div class="rc-row rc-phone"><span class="rc-label">電話</span><span class="rc-value">{{ r.customer_phone|escape }}</span></div>
                 </div>
                 {% empty %}
                 <div class="no-data">予約はありません</div>
@@ -169,7 +177,11 @@
                 <label for="customer_name">顧客名:</label>
                 <input type="text" id="customer_name" name="customer_name" class="form-control" required>
             </div>
-             <div class="form-group">
+            <div class="form-group">
+                <label for="customer_email">メールアドレス:</label>
+                <input type="email" id="customer_email" name="customer_email" class="form-control" required>
+            </div>
+            <div class="form-group">
                 <label for="customer_phone">電話番号:</label>
                 <input type="tel" id="customer_phone" name="customer_phone" class="form-control" required>
             </div>
