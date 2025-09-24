@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>ログイン - SalonReserve</title>
+    <title>ログイン - Reserve</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -233,7 +233,7 @@
     <div class="login-container">
         <div class="login-card">
             <div class="login-header">
-                <h1>SalonReserve</h1>
+                <h1>Reserve</h1>
                 <p>管理画面ログイン</p>
             </div>
 
@@ -268,26 +268,8 @@
                         </button>
                     </div>
                 </div>
-
-                <div class="password-options">
-                    <a href="#" class="forgot-password-link">パスワードをお忘れですか？</a>
-                </div>
-                
                 <button type="submit" class="btn-login" id="loginBtn">ログイン</button>
             </form>
-
-            {% if tenants %}
-            <div class="info-footer">
-                <h3>ご予約のお客様はこちら</h3>
-                <div class="tag-list">
-                    {% for tenant in tenants %}
-                        <a href="{% url 'calendar_by_tenant' tenant.slug %}" class="tag" target="_blank" rel="noopener">
-                            {{ tenant.name|escape }} 予約ページ
-                        </a>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
         </div>
         <p style="text-align: center; margin-top: 24px; font-size: 0.8rem; color: var(--color-text-light);">
             大切な情報を守るため、通信はすべて暗号化されています。
