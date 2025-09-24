@@ -12,24 +12,27 @@
 
     <style>
         :root {
-            /* 基本のデザインテーマを継承 */
-            --color-primary: #C3B1E1;
-            --color-primary-dark: #B39DD1;
-            --color-text: #4A4A4A;
-            --color-text-light: #7A7A7A;
-            --color-border: #E0E0E0;
-            --color-background: #FDFBFA;
-            --color-white: #FFFFFF;
-            --color-success: #5DBE8A;
-            --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.06);
+            --color-background: #f0f2f5;
+            --color-white: #ffffff;
+            --color-text: #2d3748;
+            --color-text-light: #718096;
+            --color-primary: #1A365D;
+            --color-primary-dark: #112644;
+            --color-primary-light: #EBF8FF;
+            --color-success: #38A169;
+            --color-success-light: #F0FFF4;
+            --color-accent-gold: #D69E2E;
+            --color-danger: #E53E3E;
+            --color-border: #E2E8F0;
+            --font-family-base: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.04);
+            --border-radius: 12px;
         }
 
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
+        *, *::before, *::after { box-sizing: border-box; }
 
         body {
-            font-family: 'Noto Sans JP', sans-serif;
+            font-family: var(--font-family-base);
             background-color: var(--color-background);
             color: var(--color-text);
             display: flex;
@@ -48,18 +51,19 @@
 
         .login-card {
             background: var(--color-white);
-            padding: 40px;
-            border-radius: 16px;
+            padding: 40px 32px;
+            border-radius: var(--border-radius);
             box-shadow: var(--shadow-md);
             border: 1px solid var(--color-border);
             text-align: center;
         }
 
         .login-header h1 {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: var(--color-primary);
             margin: 0 0 8px;
+            letter-spacing: -0.02em;
         }
 
         .login-header p {
@@ -67,16 +71,16 @@
             font-weight: 700;
             margin: 0 0 32px;
         }
-        
-        /* エラーメッセージ */
+
         .error-message {
-            background-color: #ffcdd2;
-            color: #c62828;
-            padding: 12px;
-            border-radius: 12px;
+            background-color: #fff5f5;
+            color: var(--color-danger);
+            padding: 14px;
+            border-radius: var(--border-radius);
             text-align: center;
             margin-bottom: 24px;
-            font-size: 0.9rem;
+            font-size: 0.98rem;
+            border: 1px solid #fed7d7;
         }
 
         .form-group {
@@ -86,9 +90,9 @@
 
         .form-group label {
             display: block;
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 8px;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: var(--color-text-light);
         }
 
@@ -102,26 +106,26 @@
             top: 50%;
             transform: translateY(-50%);
             color: var(--color-text-light);
-            pointer-events: none; /* アイコンをクリックしても入力欄にフォーカスが移るように */
+            pointer-events: none;
         }
-        
+
         .form-input {
             width: 100%;
-            padding: 14px 14px 14px 45px; /* アイコン分のスペースを確保 */
+            padding: 14px 14px 14px 45px;
             border: 1px solid var(--color-border);
-            border-radius: 12px;
+            border-radius: 8px;
             font-size: 1rem;
             background-color: var(--color-background);
-            transition: all 0.25s ease-out;
+            transition: all 0.2s;
             color: var(--color-text);
         }
 
         .form-input:focus {
             outline: none;
             border-color: var(--color-primary);
-            box-shadow: 0 0 0 3px rgba(195, 177, 225, 0.3);
+            box-shadow: 0 0 0 3px var(--color-primary-light);
         }
-        
+
         #password-toggle {
             position: absolute;
             right: 15px;
@@ -157,20 +161,21 @@
             width: 100%;
             padding: 14px;
             border: none;
-            border-radius: 30px;
+            border-radius: 8px;
             background-color: var(--color-primary);
             color: var(--color-white);
             font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.25s ease-out;
+            transition: all 0.2s;
+            box-shadow: var(--shadow-md);
         }
 
         .btn-login:hover {
             background-color: var(--color-primary-dark);
             transform: translateY(-2px);
         }
-        
+
         .btn-login:disabled {
             background-color: #ccc;
             cursor: not-allowed;
@@ -182,7 +187,7 @@
             padding-top: 24px;
             border-top: 1px solid var(--color-border);
         }
-        
+
         .info-footer h3 {
             font-size: 1rem;
             font-weight: 500;
@@ -196,24 +201,30 @@
             gap: 10px;
             justify-content: center;
         }
-        
+
         .tag {
             background-color: var(--color-success);
             color: var(--color-white);
             padding: 8px 16px;
             border-radius: 20px;
             text-decoration: none;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            box-shadow: var(--shadow-md);
         }
         .tag:hover {
-            opacity: 0.85;
+            background-color: var(--color-success-light);
+            color: var(--color-success);
             transform: translateY(-2px);
         }
 
         @media (max-width: 480px) {
             .login-card {
-                padding: 30px 25px;
+                padding: 28px 8px;
+            }
+            .form-input {
+                font-size: 0.98rem;
             }
         }
     </style>

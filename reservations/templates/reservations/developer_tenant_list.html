@@ -5,6 +5,269 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>開発者用テナント一覧 - 予約システム</title>
+    <style>
+        /* --- 基本設定とカラーパレット --- */
+        :root {
+            /* 色の定義 */
+            --color-background: #f0f2f5; /* 背景: ライトグレー */
+            --color-white: #ffffff;      /* カード背景: 白 */
+            --color-text: #2d3748;        /* 基本テキスト: 黒に近いダークグレー */
+            --color-text-light: #718096;  /* 補助テキスト: グレー */
+            
+            --color-primary: #1A365D;     /* 紺色: メインカラー、アクティブ要素 */
+            --color-primary-light: #EBF8FF; /* 紺色（淡）: ホバー背景など */
+            --color-success: #38A169;     /* 緑色: 予約ボタン、成功 */
+            --color-accent-gold: #D69E2E; /* 金色: アクセント、差し色 */
+            
+            --color-border: #E2E8F0;     /* 罫線 */
+
+            /* UI要素の定義 */
+            --font-family-base: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --border-radius: 12px;
+        }
+
+        /* --- 基本スタイル --- */
+        body { 
+            font-family: var(--font-family-base);
+            margin: 0; 
+            padding: 24px; 
+            background-color: var(--color-background);
+            color: var(--color-text);
+        }
+
+        .main-container { 
+            max-width: 1000px; 
+            margin: 0 auto;
+        }
+
+        /* --- ヘッダー --- */
+        .header {
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            padding: 32px;
+            border-radius: var(--border-radius);
+            margin-bottom: 32px;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+        }
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin: 0 0 8px 0;
+        }
+        .header p {
+            margin: 0;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        /* --- お知らせ・注意喚起 --- */
+        .info-notice {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: var(--color-white);
+            padding: 16px 24px;
+            border-radius: var(--border-radius);
+            border-left: 5px solid var(--color-accent-gold); /* 金色のアクセント */
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+        }
+        .info-notice svg {
+            width: 28px;
+            height: 28px;
+            color: var(--color-accent-gold);
+            flex-shrink: 0;
+        }
+        .info-notice p {
+            margin: 0;
+            font-size: 0.95em;
+            color: var(--color-text);
+        }
+
+        /* --- 戻るリンク --- */
+        .back-link-container {
+            margin-bottom: 24px;
+        }
+
+        /* --- テナントリスト --- */
+        .tenant-list { 
+            list-style: none; 
+            padding: 0; 
+            margin: 0;
+            display: grid;
+            gap: 24px;
+        }
+
+        .tenant-item { 
+            background: var(--color-white);
+            border: 1px solid var(--color-border); 
+            border-top: 4px solid var(--color-primary); /* 紺色のアクセント */
+            padding: 24px; 
+            border-radius: var(--border-radius); 
+            box-shadow: var(--shadow-md);
+            transition: all 0.2s ease-in-out;
+        }
+        .tenant-item:hover { 
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .tenant-header {
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .tenant-name { 
+            font-size: 1.6rem; 
+            font-weight: 700; 
+            color: var(--color-text);
+            margin: 0;
+        }
+
+        .tenant-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+            color: var(--color-text-light);
+        }
+
+        .tenant-info div {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9em;
+        }
+        .tenant-info div strong {
+            color: var(--color-text);
+        }
+
+        .tenant-info svg {
+            width: 20px;
+            height: 20px;
+            color: var(--color-primary);
+            flex-shrink: 0;
+        }
+
+        .tenant-actions { 
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            border-top: 1px solid var(--color-border);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        .tenant-actions .btn {
+            flex: 1; /* ボタンがスペースを均等に分け合うようにする */
+            min-width: 160px; /* ボタンが潰れすぎないように最小幅を指定 */
+        }
+
+        /* --- ボタン共通スタイル --- */
+        .btn { 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 8px; 
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .btn-primary { 
+            background-color: var(--color-primary); 
+            color: var(--color-white); 
+        }
+        .btn-primary:hover { 
+            background-color: #112644;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary { 
+            background-color: var(--color-white);
+            color: var(--color-text);
+            border-color: var(--color-border);
+        }
+        .btn-secondary:hover { 
+            background-color: #f7fafc;
+            border-color: var(--color-text-light);
+        }
+        
+        /* 新しいアクセントボタン */
+        .btn-accent-outline {
+            background-color: transparent;
+            color: var(--color-accent-gold);
+            border-color: var(--color-accent-gold);
+        }
+        .btn-accent-outline:hover {
+            background-color: #FEFBF6;
+            transform: translateY(-2px);
+        }
+
+
+        /* --- テナントなしの場合 --- */
+        .no-tenants {
+            text-align: center;
+            padding: 60px 30px;
+            background: var(--color-white);
+            border-radius: var(--border-radius);
+            color: var(--color-text-light);
+            box-shadow: var(--shadow-sm);
+            border: 1px dashed var(--color-border);
+        }
+        .no-tenants h3 {
+            font-size: 1.5rem;
+            color: var(--color-text);
+            margin: 0 0 12px 0;
+        }
+        .no-tenants p {
+            margin: 0 0 24px 0;
+        }
+
+        /* --- フッター --- */
+        .footer-link {
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        /* --- レスポンシブ対応 --- */
+        @media (max-width: 768px) {
+            .tenant-actions {
+                flex-direction: column;
+            }
+            .tenant-actions .btn {
+                width: 85%;
+                flex-grow: 1;
+            }
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            .tenant-name {
+                font-size: 1.4rem;
+            }
+        }
+        @media (max-width: 480px) {
+            body { padding: 16px; }
+            .header { padding: 24px; }
+            .tenant-item { padding: 16px; }
+            .tenant-info { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
     <div class="main-container">
@@ -34,52 +297,34 @@
                 </div>
                 <div class="tenant-info">
                     <div>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                        </svg>
-                        <span><strong>オーナー:</strong> {{ tenant.owner.username|escape }} ({{ tenant.owner.email|escape }})</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                        <span><strong>オーナー:</strong> {{ tenant.owner.username|escape }}</span>
                     </div>
                     <div>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
-                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
+                        <span><strong>Email:</strong> {{ tenant.owner.email|escape }}</span>
+                    </div>
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
                         <span><strong>スラッグ:</strong> {{ tenant.slug|escape }}</span>
                     </div>
                     <div>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                        </svg>
-                        <span><strong>作成日:</strong> {{ tenant.created_at|date:"Y年m月d日 H:i"|default:"不明" }}</span>
-                    </div>
-                    <div>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span><strong>営業時間:</strong> {{ tenant.start_time|time:"H:i" }} - {{ tenant.end_time|time:"H:i" }}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>
+                        <span><strong>作成日:</strong> {{ tenant.created_at|date:"Y/m/d"|default:"不明" }}</span>
                     </div>
                 </div>
                 <div class="tenant-actions">
-                    <a href="{% url 'owner_reserve_list_by_tenant' tenant.slug %}" class="btn btn-action btn-primary">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m.75 12l2.25 2.25 3-3m-6.829 4.382a2.25 2.25 0 01-2.09-2.09l-.75-3.75A1.125 1.125 0 011.5 12v-.75m7.5-6v.75m0-3h-3a1.125 1.125 0 00-1.125 1.125v1.5a3.375 3.375 0 003.375 3.375h1.5A1.125 1.125 0 0118 7.5v.75m-5.25 6h4.5" />
-                        </svg>
-                        <span>予約管理（推奨）</span>
+                    <a href="{% url 'owner_reserve_list_by_tenant' tenant.slug %}" class="btn btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" /></svg>
+                        <span>予約管理 (推奨)</span>
                     </a>
-                    <a href="{% url 'calendar_by_tenant' tenant.slug %}" class="btn btn-action btn-secondary" target="_blank" rel="noopener">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.575 3.01 9.963 7.823.08.384.08.637 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.575-3.01-9.963-7.823z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <span>顧客画面</span>
+                    <a href="{% url 'calendar_by_tenant' tenant.slug %}" class="btn btn-secondary" target="_blank" rel="noopener">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-4.5 0V6.75A2.25 2.25 0 0111.25 4.5h1.5a2.25 2.25 0 012.25 2.25v1.5m-4.5 0h4.5m-4.5 0a2.25 2.25 0 01-2.25-2.25V6.75m0 0A2.25 2.25 0 015.25 4.5h1.5M13.5 6m-3 0a3 3 0 106 0 3 3 0 00-6 0" /></svg>
+                        <span>顧客プレビュー</span>
                     </a>
-                    <a href="/admin/reservations/tenant/{{ tenant.id }}/change/" class="btn btn-action btn-success" target="_blank" rel="noopener">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.75c.504-.253 1.06-.395 1.626-.453a4.875 4.875 0 013.298 0c.566.058 1.122.2 1.626.453M12 18.75a3.75 3.75 0 100-7.5 3.75 3.75 0 000 7.5zM12 12m-2.25 0a2.25 2.25 0 114.5 0 2.25 2.25 0 01-4.5 0zM12 12m-2.25 0a2.25 2.25 0 114.5 0 2.25 2.25 0 01-4.5 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a5.25 5.25 0 00-5.25 5.25v.75m10.5 0v-.75c0-2.9-2.35-5.25-5.25-5.25z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a5.25 5.25 0 00-5.25 5.25v.75M12 12m-2.25 0a2.25 2.25 0 114.5 0 2.25 2.25 0 01-4.5 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a5.25 5.25 0 00-5.25 5.25v.75" />
-                        </svg>
-                        <span>設定変更</span>
+                    <a href="/admin/reservations/tenant/{{ tenant.id }}/change/" class="btn btn-accent-outline" target="_blank" rel="noopener">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.75c.504-.253 1.06-.395 1.626-.453a4.875 4.875 0 013.298 0c.566.058 1.122.2 1.626.453m-9.92 0a4.875 4.875 0 013.298 0M12 21a9 9 0 100-18 9 9 0 000 18z" /></svg>
+                        <span>Djangoで設定変更</span>
                     </a>
                 </div>
             </li>
@@ -99,250 +344,32 @@
 
         <div class="footer-link">
             <a href="/admin/" class="btn btn-secondary" target="_blank" rel="noopener">
-                🔐 Django管理画面
+                🔐 Django管理画面を開く
             </a>
         </div>
     </div>
 
-    <style>
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; 
-            margin: 0; 
-            padding: 20px; 
-            background-color: #f0f4f8;
-            color: #333;
-        }
-
-        .main-container { 
-            max-width: 1000px; 
-            margin: 0 auto; 
-            padding: 0 15px;
-        }
-
-        .header {
-            background-color: #8E7CC3;
-            color: white;
-            padding: 30px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            text-align: center;
-            box-shadow: 0 6px 20px rgba(142, 124, 195, 0.3);
-            background: linear-gradient(135deg, #8E7CC3 0%, #6A5B9C 100%);
-        }
-
-        .header h1 {
-            font-size: 2.2rem;
-            margin-bottom: 5px;
-        }
-        
-        .header p {
-            margin: 0;
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.85);
-        }
-
-        /* お知らせ・セキュリティ通知 */
-        .info-notice {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: #fff;
-            padding: 15px 20px;
-            border-radius: 8px;
-            border-left: 5px solid #8E7CC3;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
-        }
-        
-        .info-notice svg {
-            width: 24px;
-            height: 24px;
-            color: #8E7CC3;
-        }
-
-        .info-notice p {
-            margin: 0;
-            font-size: 0.95em;
-            color: #555;
-        }
-
-        /* 戻るリンク */
-        .back-link-container {
-            margin-bottom: 25px;
-        }
-
-        /* テナントリスト */
-        .tenant-list { 
-            list-style: none; 
-            padding: 0; 
-            margin: 0;
-        }
-
-        .tenant-item { 
-            background: white;
-            border: 1px solid #dee2e6; 
-            margin: 15px 0; 
-            padding: 20px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
-        .tenant-item:hover { 
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        }
-
-        .tenant-header {
-            border-bottom: 1px solid #EEE;
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-        }
-
-        .tenant-name { 
-            font-size: 1.5rem; 
-            font-weight: 700; 
-            color: #495057;
-            margin: 0;
-        }
-
-        .tenant-info {
-            margin-bottom: 20px;
-            color: #6c757d;
-        }
-
-        .tenant-info div {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            font-size: 0.95em;
-        }
-
-        .tenant-info svg {
-            width: 20px;
-            height: 20px;
-            color: #8E7CC3;
-        }
-
-        .tenant-actions { 
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .btn { 
-            padding: 12px 20px; 
-            text-decoration: none; 
-            border-radius: 8px; 
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            flex-grow: 1;
-            justify-content: center;
-        }
-
-        .btn-primary { 
-            background-color: #8E7CC3; 
-            color: white; 
-        }
-
-        .btn-primary:hover { 
-            background-color: #7A69A9; 
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary { 
-            background-color: #E0E0E0; 
-            color: #555;
-        }
-
-        .btn-secondary:hover { 
-            background-color: #D3D3D3; 
-        }
-        
-        .btn-success {
-            background-color: #4AD295;
-            color: white;
-        }
-        
-        .btn-success:hover {
-            background-color: #36B880;
-            transform: translateY(-2px);
-        }
-
-        .no-tenants {
-            text-align: center;
-            padding: 60px 20px;
-            background: white;
-            border-radius: 12px;
-            color: #6c757d;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-        
-        .no-tenants h3 {
-            font-size: 1.5rem;
-            color: #555;
-        }
-        
-        .no-tenants p {
-            margin-bottom: 20px;
-        }
-
-        .footer-link {
-            text-align: center;
-            margin-top: 30px;
-        }
-
-        /* レスポンシブ対応 */
-        @media (max-width: 768px) {
-            .tenant-actions {
-                flex-direction: column;
-            }
-            .btn-action {
-                width: 100%;
-            }
-            .header h1 {
-                font-size: 1.8rem;
-            }
-            .tenant-item {
-                padding: 15px;
-            }
-            .tenant-name {
-                font-size: 1.3rem;
-            }
-            .tenant-info div {
-                font-size: 0.9em;
-                margin-bottom: 8px;
-            }
-        }
-    </style>
-
     <script>
+        // 既存のJavaScriptはそのまま機能するため、変更は不要です。
         document.querySelectorAll('a[target="_blank"]').forEach(link => {
             link.addEventListener('click', function(e) {
                 const url = this.href;
-                if (url.includes('/admin/') && !confirm('管理画面を開きますか？\n注意: すべての操作は記録されています。')) {
-                    e.preventDefault();
+                if (url.includes('/admin/')) {
+                    if (!confirm('Django管理画面を新しいタブで開きますか？\n注意: この画面での操作はすべて記録されています。')) {
+                        e.preventDefault();
+                    }
                 }
             });
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('開発者用テナント一覧が読み込まれました');
-            
-            const tenantCount = document.querySelectorAll('.tenant-item').length;
-            console.log(`表示中のテナント数: ${tenantCount}`);
-        });
-
         document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.key === 'd') {
+            // Ctrl+D or Cmd+Dでダッシュボードに戻るショートカット
+            if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
                 e.preventDefault();
-                window.location.href = "{% url 'developer_dashboard' %}";
+                const backLink = document.querySelector(".back-link-container a");
+                if (backLink) {
+                    window.location.href = backLink.href;
+                }
             }
         });
     </script>
