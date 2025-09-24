@@ -16,297 +16,227 @@
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     
     <style>
-        :root {
-            --color-background: #f0f2f5;
-            --color-white: #ffffff;
-            --color-text: #2d3748;
-            --color-text-light: #718096;
-            --color-primary: #1A365D;
-            --color-primary-dark: #112644;
-            --color-primary-light: #EBF8FF;
-            --color-success: #38A169;
-            --color-success-light: #F0FFF4;
-            --color-accent-gold: #D69E2E;
-            --color-danger: #E53E3E;
-            --color-border: #E2E8F0;
-            --font-family-base: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            --shadow-sm: 0 1px 3px 0 rgba(0,0,0,0.04), 0 1px 2px 0 rgba(0,0,0,0.02);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.04);
-            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
-            --border-radius: 12px;
-        }
+    :root {
+        --color-background: #f0f2f5;
+        --color-white: #ffffff;
+        --color-text: #2d3748;
+        --color-text-light: #718096;
+        --color-primary: #1A365D;
+        --color-primary-dark: #112644;
+        --color-primary-light: #EBF8FF;
+        --color-success: #38A169;
+        --color-success-light: #F0FFF4;
+        --color-accent-gold: #D69E2E;
+        --color-danger: #E53E3E;
+        --color-border: #E2E8F0;
+        --font-family-base: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        --shadow-sm: 0 1px 3px 0 rgba(0,0,0,0.04), 0 1px 2px 0 rgba(0,0,0,0.02);
+        --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.04);
+        --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        --border-radius: 12px;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
 
+    body {
+        font-family: var(--font-family-base);
+        background-color: var(--color-background);
+        color: var(--color-text);
+        line-height: 1.8;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        font-size: 16px; /* ベースフォントサイズを指定 */
+    }
+
+    .main-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 32px;
+    }
+
+    .card {
+        background: var(--color-white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-md);
+        padding: 32px;
+        border: 1px solid var(--color-border);
+    }
+
+    .header-nav {
+        background: var(--color-primary);
+        color: var(--color-white);
+        padding: 32px;
+        margin-bottom: 32px;
+        border-radius: var(--border-radius);
+        text-align: center;
+    }
+
+    .header-nav h1 {
+        color: var(--color-white);
+        font-size: 2.2rem;
+        margin: 0 0 8px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+
+    .header-nav p {
+        margin: 0;
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        color: var(--color-text);
+        margin-top: 0;
+        margin-bottom: 16px;
+        font-weight: 700;
+        line-height: 1.4; /* 見出しの行間を調整 */
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 24px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: var(--shadow-sm);
+        white-space: nowrap; /* ボタン内テキストの改行を防ぐ */
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary { background: var(--color-primary); color: var(--color-white); }
+    .btn-primary:hover { background: var(--color-primary-dark); }
+    .btn-secondary { background: var(--color-primary-light); color: var(--color-primary); border-color: var(--color-border); }
+    .btn-secondary:hover { background: var(--color-white); border-color: var(--color-primary); }
+    .btn-success { background: var(--color-success); color: var(--color-white); }
+    .btn-success:hover { background: #258a4a; }
+    .btn-danger { background: var(--color-danger); color: var(--color-white); }
+    .btn-danger:hover { background: #a91d1d; }
+
+    .table-container { overflow-x: auto; width: 100%; }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 600px;
+        background: var(--color-white);
+        border: 1px solid var(--color-border);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }
+    th, td { padding: 16px; text-align: left; border-bottom: 1px solid var(--color-border); }
+    th { background: #f7fafc; color: var(--color-text-light); font-weight: 600; font-size: 0.95rem; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover { background-color: #fcfdff; }
+
+    .alert {
+        padding: 16px;
+        margin-bottom: 24px;
+        border-radius: var(--border-radius);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border: 1px solid transparent;
+    }
+    .alert p { margin: 0; }
+    .alert-success { color: var(--color-success); background-color: var(--color-success-light); border-color: #a5d6a7; }
+    .alert-error, .alert-danger { color: var(--color-danger); background-color: #fff5f5; border-color: #ef9a9a; }
+    .alert-warning { color: #ef6c00; background-color: #fff3e0; border-color: #ffcc80; }
+    .alert-info { color: #0277bd; background-color: #e1f5fe; border-color: #81d4fa; }
+    .alert svg { width: 22px; height: 22px; flex-shrink: 0; }
+
+    .form-group { margin-bottom: 24px; }
+    .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--color-text-light); }
+    .form-input, .form-select, .form-textarea {
+        width: 100%;
+        padding: 14px;
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        font-size: 1rem;
+        background-color: var(--color-white);
+        transition: all 0.2s;
+        color: var(--color-text);
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px var(--color-primary-light);
+    }
+    .breadcrumb { padding: 0; margin-bottom: 24px; font-size: 0.9rem; color: var(--color-text-light); }
+    .breadcrumb a { color: var(--color-text-light); text-decoration: none; transition: color 0.3s; }
+    .breadcrumb a:hover { color: var(--color-primary); }
+    .breadcrumb span { margin: 0 8px; }
+
+    .footer {
+        margin-top: 48px;
+        padding-top: 24px;
+        border-top: 1px solid var(--color-border);
+        text-align: center;
+        color: var(--color-text-light);
+        font-size: 0.85rem;
+    }
+
+    /* --- タブレット向け (768px以下) --- */
+    @media (max-width: 768px) {
+        .main-container { padding: 24px; }
+        .card { padding: 24px; }
+        .header-nav { padding: 24px; margin-bottom: 24px; }
+        .header-nav h1 { font-size: 1.8rem; }
+        table { font-size: 14px; }
+        th, td { padding: 12px; }
+    }
+
+    /* --- スマホ向け (480px以下) - 375pxもカバー --- */
+    @media (max-width: 480px) {
         body {
-            font-family: var(--font-family-base);
-            background-color: var(--color-background);
-            color: var(--color-text);
-            line-height: 1.8;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            font-size: 15px; /* スマホ向けにフォントサイズを調整 */
+            line-height: 1.7;
         }
-
         .main-container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 24px;
+            padding: 16px; /* 余白を調整 */
         }
-
         .card {
-            background: var(--color-white);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-md);
-            padding: 32px;
-            border: 1px solid var(--color-border);
+            padding: 20px 16px; /* 余白を調整 */
         }
-
         .header-nav {
-            background: var(--color-primary);
-            color: var(--color-white);
-            padding: 32px;
-            margin-bottom: 32px;
-            border-radius: var(--border-radius);
-            text-align: center;
+            padding: 20px 16px;
+            margin-bottom: 20px;
         }
-
         .header-nav h1 {
-            color: var(--color-white);
-            font-size: 2.2rem;
-            margin: 0 0 8px;
-            font-weight: 700;
-            letter-spacing: -0.02em;
+            font-size: 1.5rem; /* 見出しを調整 */
         }
-
-        .header-nav p {
-            margin: 0;
-            font-size: 1rem;
-            opacity: 0.9;
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-            color: var(--color-text);
-            margin-top: 0;
-            margin-bottom: 16px;
-            font-weight: 700;
-        }
-
         .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .btn-primary {
-            background: var(--color-primary);
-            color: var(--color-white);
-        }
-        .btn-primary:hover {
-            background: var(--color-primary-dark);
-        }
-
-        .btn-secondary {
-            background: var(--color-primary-light);
-            color: var(--color-primary);
-            border: 1px solid var(--color-border);
-        }
-        .btn-secondary:hover {
-            background: var(--color-white);
-            color: var(--color-primary);
-            border-color: var(--color-primary);
-        }
-
-        .btn-success {
-            background: var(--color-success);
-            color: var(--color-white);
-        }
-        .btn-success:hover {
-            background: #258a4a;
-        }
-
-        .btn-danger {
-            background: var(--color-danger);
-            color: var(--color-white);
-        }
-        .btn-danger:hover {
-            background: #a91d1d;
-        }
-
-        .table-container {
-            overflow-x: auto;
-            width: 100%;
-        }
-
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            min-width: 600px;
-            background: var(--color-white);
-            border: 1px solid var(--color-border);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-        }
-
-        th, td {
-            padding: 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--color-border);
-        }
-
-        th {
-            background: #f7fafc;
-            color: var(--color-text-light);
-            font-weight: 600;
+            width: 100%; /* ボタンは原則フル幅に */
+            padding: 14px 16px;
             font-size: 0.95rem;
-            text-transform: none;
         }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover {
-            background-color: #f0f2f5;
-        }
-
-        .alert {
-            padding: 16px;
-            margin-bottom: 24px;
-            border-radius: var(--border-radius);
+        /* 複数のボタンを横並びにしたい場合のためのヘルパークラス */
+        .button-group {
             display: flex;
-            align-items: center;
             gap: 12px;
-            border: 1px solid transparent;
         }
-
-        .alert p { margin: 0; }
-        .alert-success { color: var(--color-success); background-color: var(--color-success-light); border-color: #a5d6a7; }
-        .alert-error, .alert-danger { color: var(--color-danger); background-color: #fff5f5; border-color: #ef9a9a; }
-        .alert-warning { color: #ef6c00; background-color: #fff3e0; border-color: #ffcc80; }
-        .alert-info { color: #0277bd; background-color: #e1f5fe; border-color: #81d4fa; }
-        .alert svg { width: 22px; height: 22px; flex-shrink: 0; }
-
-        .form-group {
-            margin-bottom: 24px;
+        .button-group .btn {
+            width: auto; /* グループ内のボタンは自動幅に */
+            flex: 1; /* スペースを分け合う */
         }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--color-text-light);
-        }
-
         .form-input, .form-select, .form-textarea {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid var(--color-border);
-            border-radius: 8px;
-            font-size: 1rem;
-            background-color: var(--color-white);
-            transition: all 0.2s;
-            color: var(--color-text);
+            padding: 12px; /* フォームの余白を調整 */
         }
-
-        .form-input:focus, .form-select:focus, .form-textarea:focus {
-            outline: none;
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 3px var(--color-primary-light);
-        }
-
-        .breadcrumb {
-            padding: 0;
-            margin-bottom: 24px;
-            font-size: 0.9rem;
-            color: var(--color-text-light);
-        }
-
-        .breadcrumb a {
-            color: var(--color-text-light);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .breadcrumb a:hover {
-            color: var(--color-primary);
-        }
-
-        .breadcrumb span {
-            margin: 0 8px;
-        }
-
-        .footer {
-            margin-top: 48px;
-            padding-top: 24px;
-            border-top: 1px solid var(--color-border);
-            text-align: center;
-            color: var(--color-text-light);
-            font-size: 0.85rem;
-        }
-
-        @media (max-width: 768px) {
-            .main-container {
-                padding: 16px;
-            }
-            .card {
-                padding: 24px;
-            }
-            .header-nav {
-                padding: 24px;
-                margin-bottom: 24px;
-            }
-            .header-nav h1 {
-                font-size: 1.8rem;
-            }
-            table {
-                font-size: 14px;
-            }
-            th, td {
-                padding: 12px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                line-height: 1.7;
-            }
-            .main-container {
-                padding: 8px;
-            }
-            .card {
-                padding: 14px;
-            }
-            .header-nav {
-                padding: 14px;
-                margin-bottom: 14px;
-            }
-            .header-nav h1 {
-                font-size: 1.3rem;
-            }
-            .btn {
-                width: 100%;
-                padding: 14px;
-            }
-        }
-    </style>
+    }
+</style>
     
     {% block extra_head %}{% endblock %}
 </head>
