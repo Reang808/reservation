@@ -36,7 +36,7 @@ ALLOWED_HOSTS = ['reang-reserve.jp', 'www.reang-reserve.jp', '163.44.123.195',]
 # Application definition
 
 INSTALLED_APPS = [
-    # 'grappelli',  # この行をコメントアウトまたは削除
+    'grappelli',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
