@@ -44,7 +44,7 @@
         background-color: var(--color-background);
         font-family: var(--font-family-base);
         color: var(--color-text);
-        -webkit-text-size-adjust: 70%; /* スマホでの自動文字サイズ調整を無効化 */
+        -webkit-text-size-adjust: 100%; /* スマホでの自動文字サイズ調整を無効化 */
     }
 
     .container {
@@ -382,14 +382,22 @@
             gap: 20px;
         }
         #calendar-header {
-            grid-template-columns: 1fr;
-            gap: 12px;
+            grid-template-columns: 1fr 2fr 1fr; /* 横並びを維持 */
+            gap: 8px;
             padding: 16px;
-            text-align: center;
         }
 
-        #prev-month, #next-month, #calendar-title {
-            justify-self: center; /* タブレットではすべて中央 */
+        #prev-month {
+            justify-self: start; /* 左寄せを維持 */
+        }
+
+        #calendar-title {
+            justify-self: center; /* センターを維持 */
+            font-size: 1.2rem; /* タブレット用にサイズ調整 */
+        }
+
+        #next-month {
+            justify-self: end; /* 右寄せを維持 */
         }
         #calendar-table th {
             font-size: 0.8rem;
@@ -440,12 +448,27 @@
             height: 24px;
         }
 
-        #calendar-header h2 {
-            font-size: 0.8rem;
+        #calendar-header {
+            grid-template-columns: 1fr 2fr 1fr; /* 横並びを維持 */
+            gap: 4px;
+            padding: 12px 8px;
         }
-        #calendar-header button {
-            padding: 8px 14px;
-            font-size: 0.8rem;
+
+        #prev-month {
+            justify-self: start;
+            padding: 6px 8px;
+            font-size: 0.7rem;
+        }
+
+        #calendar-title {
+            justify-self: center;
+            font-size: 0.9rem;
+        }
+
+        #next-month {
+            justify-self: end;
+            padding: 6px 8px;
+            font-size: 0.7rem;
         }
         #calendar-table th {
             font-size: 0.7rem;
