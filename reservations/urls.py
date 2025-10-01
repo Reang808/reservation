@@ -12,6 +12,11 @@ urlpatterns = [
     # 顧客向け（認証不要）
     path('tenant/<slug:tenant_slug>/', views.calendar_view, name='calendar_by_tenant'),
     path('tenant/<slug:tenant_slug>/reserve/', views.reserve_slot, name='reserve_slot_by_tenant'),
+
+    
+    # API エンドポイント（学習用）
+    path('tenant/<slug:tenant_slug>/api/info/', views.api_tenant_info, name='api_tenant_info'),
+    path('tenant/<slug:tenant_slug>/api/slots/', views.api_get_slots, name='api_get_slots'),
     
     # 開発者専用
     path('developer/', views.developer_dashboard, name='developer_dashboard'),
@@ -30,6 +35,14 @@ urlpatterns = [
     path('owner/tenant/<slug:tenant_slug>/reserve/', views_owner.owner_reserve_list_by_tenant, name='owner_reserve_list_by_tenant'),
     path('owner/tenant/<slug:tenant_slug>/menu/', views_menu_owner.owner_menu_list_by_tenant, name='owner_menu_list_by_tenant'),
     path('owner/tenant/<slug:tenant_slug>/email-settings/', views_owner.owner_email_settings, name='owner_email_settings'),
+    path('owner/tenant/<slug:tenant_slug>/calendar/', views_owner.owner_calendar_view, name='owner_calendar_view'),
+    
+    # オーナー向けAPI
+    path('owner/tenant/<slug:tenant_slug>/api/slots/', views_owner.api_owner_slots, name='api_owner_slots'),
+    path('owner/tenant/<slug:tenant_slug>/api/reservation-counts/', views_owner.api_reservation_counts, name='api_reservation_counts'),
+    path('owner/tenant/<slug:tenant_slug>/api/reservation/<int:reservation_id>/', views_owner.api_reservation_detail, name='api_reservation_detail'),
+    path('owner/tenant/<slug:tenant_slug>/api/reservation/<int:reservation_id>/delete/', views_owner.api_delete_reservation, name='api_delete_reservation'),
+    path('owner/tenant/<slug:tenant_slug>/api/reservation/create/', views_owner.api_create_reservation, name='api_create_reservation'),
     
     # 非推奨/削除予定（セキュリティ上問題のあるパターン）
     # path('calendar/', views.calendar_view, name='calendar'),  # tenant_slug不要のため削除

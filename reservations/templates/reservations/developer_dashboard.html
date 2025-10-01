@@ -287,7 +287,7 @@
                             <td class="hide-on-mobile">{{ tenant.created_at|date:"Y/m/d"|default:"不明" }}</td>
                             <td>
                                 <div class="tenant-actions">
-                                    <a href="{% url 'owner_reserve_list_by_tenant' tenant.slug %}" class="btn btn-primary btn-sm">管理</a>
+                                    <a href="{% url 'owner_calendar_view' tenant.slug %}" class="btn btn-primary btn-sm">管理</a>
                                     <a href="{% url 'calendar_by_tenant' tenant.slug %}" class="btn btn-secondary btn-sm" target="_blank" rel="noopener">プレビュー</a>
                                     <a href="/admin/reservations/tenant/{{ tenant.id }}/change/" class="btn btn-accent-outline btn-sm" target="_blank" rel="noopener">設定</a>
                                 </div>

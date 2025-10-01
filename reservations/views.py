@@ -18,6 +18,7 @@ from django.contrib.auth import authenticate, login
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 from datetime import datetime, date, timedelta
 from .models import Tenant, Menu, Reservation
 from .decorators import role_required
@@ -48,7 +49,7 @@ def is_open_day(day, tenant):
     return days[weekday]
 
 def calendar_view(request, tenant_slug=None):
-    """顧客向けカレンダー表示（認証不要）"""
+    """顧客向けカレンダー表示（新しい月表示カレンダー）"""
     if tenant_slug:
         tenant = get_object_or_404(Tenant, slug=tenant_slug)
     else:
@@ -57,52 +58,10 @@ def calendar_view(request, tenant_slug=None):
             'message': '店舗を指定してアクセスしてください。例: /tenant/店舗ID/'
         })
     
-    # 週の計算
-    week_offset = int(request.GET.get('week_offset', 0))
-    today = date.today()
-    start_of_week = today - timedelta(days=today.weekday()) + timedelta(weeks=week_offset)
-    week_days = [start_of_week + timedelta(days=i) for i in range(7)]
-    
-    # テナント設定による時間枠
-    time_slots = get_tenant_time_slots(tenant)
-    
-    # 予約データ取得
-    reservations = Reservation.objects.filter(tenant=tenant, date__in=week_days)
-    res_dict = {f"{r.date}_{r.time_slot}": r for r in reservations}
-    
-    # カレンダーデータ構築
-    calendar_rows = []
-    for slot in time_slots:
-        row = []
-        for day in week_days:
-            key = f"{day}_{slot}"
-            reservation = res_dict.get(key)
-            is_open = is_open_day(day, tenant)
-            
-            # 予約可能時間チェック
-            now = datetime.now()
-            slot_datetime = datetime.combine(day, slot)
-            available = slot_datetime >= now + timedelta(hours=tenant.advance_hours)
-            
-            row.append({
-                'day': day,
-                'slot': slot,
-                'reservation': reservation,
-                'is_open_day': is_open,
-                'available': available and is_open,
-                'key': f"{day}_{slot.strftime('%H-%M')}"
-            })
-        calendar_rows.append(row)
-    
-    context = {
-        'tenant': tenant,
-        'tenant_slug': tenant_slug,
-        'week_days': week_days,
-        'time_slots': time_slots,
-        'calendar_rows': calendar_rows,
-        'week_offset': week_offset,
-    }
-    return render(request, 'reservations/calendar.html', context)
+    # 新しいカレンダー用のシンプルなコンテキスト
+    return render(request, 'reservations/calendar.html', {
+        'tenant': tenant
+    })
 
 # CSRFデコレータを削除し、適切なセキュリティを実装
 def reserve_slot(request, tenant_slug=None):
@@ -158,15 +117,17 @@ def reserve_slot(request, tenant_slug=None):
                 time_slot=reserve_time
             )
             
-            # 顧客へSMS通知（既存機能維持）
-            sms_msg = f"{tenant.name}のご予約が完了しました。\n日時: {reserve_date} {reserve_time.strftime('%H:%M')}\nお名前: {customer_name}"
-            send_sms(customer_phone, sms_msg)
+            # SMS通知（ブロック予約でない場合のみ）
+            if customer_name != 'BLOCKED':
+                # 顧客へSMS通知
+                sms_msg = f"{tenant.name}のご予約が完了しました。\n日時: {reserve_date} {reserve_time.strftime('%H:%M')}\nお名前: {customer_name}"
+                send_sms(customer_phone, sms_msg)
 
-            # 事業者へSMS通知（オーナーの電話番号があれば）
-            owner_phone = getattr(tenant.owner, 'phone', None)
-            if owner_phone:
-                owner_msg = f"新しい予約が入りました。\n日時: {reserve_date} {reserve_time.strftime('%H:%M')}\n顧客: {customer_name}"
-                send_sms(owner_phone, owner_msg)
+                # 事業者へSMS通知（オーナーの電話番号があれば）
+                owner_phone = getattr(tenant.owner, 'phone', None)
+                if owner_phone:
+                    owner_msg = f"新しい予約が入りました。\n日時: {reserve_date} {reserve_time.strftime('%H:%M')}\n顧客: {customer_name}"
+                    send_sms(owner_phone, owner_msg)
         else:
             raise ValueError("この時間は既に予約済みです")
         
@@ -206,8 +167,11 @@ def login_view(request):
         if hasattr(request.user, 'role') and request.user.role == 'owner':
             tenant = Tenant.objects.filter(owner=request.user).first()
             if tenant:
-                return redirect('owner_reserve_list_by_tenant', tenant_slug=tenant.slug)
-        return redirect('owner_reserve_calendar')
+                return redirect('owner_calendar_view', tenant_slug=tenant.slug)
+        tenant = Tenant.objects.filter(owner=request.user).first()
+        if tenant:
+            return redirect('owner_calendar_view', tenant_slug=tenant.slug)
+        return redirect('developer_tenant_list')
     
     error = None
     if request.method == 'POST':
@@ -223,8 +187,11 @@ def login_view(request):
                     return redirect('developer_tenant_list')
                 tenant = Tenant.objects.filter(owner=user).first()
                 if tenant:
-                    return redirect('owner_reserve_list_by_tenant', tenant_slug=tenant.slug)
-                return redirect('owner_reserve_calendar')
+                    return redirect('owner_calendar_view', tenant_slug=tenant.slug)
+                tenant = Tenant.objects.filter(owner=user).first()
+                if tenant:
+                    return redirect('owner_calendar_view', tenant_slug=tenant.slug)
+                return redirect('developer_tenant_list')
             else:
                 error = "事業者アカウントでログインしてください。"
         else:
@@ -236,4 +203,97 @@ def login_view(request):
     return render(request, 'reservations/login.html', {
         'error': error,
         'tenants': tenants
+    })
+
+# ===========================================
+# API エンドポイント（学習用）
+# ===========================================
+
+def api_tenant_info(request, tenant_slug):
+    """
+    最初のAPI: テナント情報を取得
+    使い方: /tenant/reang/api/info/
+    """
+    # テナントを取得
+    tenant = get_object_or_404(Tenant, slug=tenant_slug)
+    
+    # テナント情報をJSON形式で返す
+    tenant_data = {
+        'name': tenant.name,
+        'slug': tenant.slug,
+        'start_time': tenant.start_time.strftime('%H:%M'),
+        'end_time': tenant.end_time.strftime('%H:%M'),
+        'slot_duration': tenant.slot_duration,
+        'business_days': {
+            'monday': tenant.monday_open,
+            'tuesday': tenant.tuesday_open,
+            'wednesday': tenant.wednesday_open,
+            'thursday': tenant.thursday_open,
+            'friday': tenant.friday_open,
+            'saturday': tenant.saturday_open,
+            'sunday': tenant.sunday_open,
+        }
+    }
+    
+    return JsonResponse(tenant_data)
+
+def api_get_slots(request, tenant_slug):
+    """
+    ステップ2のAPI: 指定日の時間スロット取得
+    使い方: /tenant/test/api/slots/?date=2025-10-01
+    """
+    # URLパラメータから日付を取得
+    date_str = request.GET.get('date')
+    if not date_str:
+        return JsonResponse({'error': '日付が指定されていません'}, status=400)
+    
+    try:
+        # 日付文字列をDateオブジェクトに変換
+        target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        return JsonResponse({'error': '日付の形式が正しくありません'}, status=400)
+    
+    # テナント情報を取得
+    tenant = get_object_or_404(Tenant, slug=tenant_slug)
+    
+    # 営業日チェック
+    if not is_open_day(target_date, tenant):
+        return JsonResponse({
+            'slots': [],
+            'message': 'この日は営業日ではありません'
+        })
+    
+    # 時間スロットを生成
+    slots = []
+    current_time = datetime.combine(target_date, tenant.start_time)
+    end_time = datetime.combine(target_date, tenant.end_time)
+    
+    while current_time < end_time:
+        time_str = current_time.strftime('%H:%M')
+        
+        # 既存の予約をチェック
+        is_reserved = Reservation.objects.filter(
+            tenant=tenant,
+            date=target_date,
+            time_slot=current_time.time()
+        ).exists()
+        
+        # 予約可能時間チェック（現在時刻から指定時間後以降）
+        now = timezone.now()
+        slot_datetime = timezone.make_aware(current_time)
+        is_available = slot_datetime >= now + timedelta(hours=tenant.advance_hours)
+        
+        slots.append({
+            'time': time_str,
+            'is_available': is_available and not is_reserved,
+            'is_reserved': is_reserved
+        })
+        
+        # 次の時間スロットに進む
+        current_time += timedelta(minutes=tenant.slot_duration)
+    
+    return JsonResponse({
+        'slots': slots,
+        'date': date_str,
+        'tenant_name': tenant.name
     })

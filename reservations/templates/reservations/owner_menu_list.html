@@ -16,7 +16,7 @@
 
         <div class="button-group">
             <a href="{% url 'owner_menu_list_by_tenant' tenant.slug %}" class="btn btn-primary active">メニュー管理</a>
-            <a href="{% url 'owner_reserve_list_by_tenant' tenant.slug %}" class="btn btn-secondary">予約カレンダー</a>
+            <a href="{% url 'owner_calendar_view' tenant.slug %}" class="btn btn-secondary">予約カレンダー</a>
         </div>
 
         <div class="table-container">

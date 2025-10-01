@@ -12,6 +12,11 @@ def send_reservation_emails(sender, instance, created, **kwargs):
     予約が作成された時に自動でメール通知を送信
     """
     if created:  # 新規作成時のみ
+        # ブロック予約の場合はメール送信をスキップ
+        if instance.customer_name == 'BLOCKED':
+            logger.info(f"予約ID {instance.id}: ブロック予約のためメール送信をスキップしました")
+            return
+            
         try:
             # 予約者への確認メール送信
             confirmation_sent = send_reservation_confirmation_email(instance)
