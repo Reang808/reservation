@@ -27,7 +27,6 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-ci^#s3(v54#teb63ha-#n
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
-# config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = ['reang-reserve.jp', 'www.reang-reserve.jp', '163.44.123.195',]
 #'127.0.0.1:8000', '127.0.0.1', 'localhost' 

@@ -1,5 +1,23 @@
+
 {% load static %}
-{% block extra_head %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="description" content="{{ tenant.name|escape }} - 予約カレンダー">
+    <title>{{ tenant.name|escape }} - 予約カレンダー</title>
+    
+    <!-- フォント読み込み -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- セキュリティヘッダー -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
 
 <style>
     :root {
@@ -26,7 +44,7 @@
         background-color: var(--color-background);
         font-family: var(--font-family-base);
         color: var(--color-text);
-        -webkit-text-size-adjust: 100%; /* スマホでの自動文字サイズ調整を無効化 */
+        -webkit-text-size-adjust: 70%; /* スマホでの自動文字サイズ調整を無効化 */
     }
 
     .container {
@@ -117,8 +135,8 @@
     }
 
     #calendar-header {
-        display: flex;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
         align-items: center;
         padding: 12px;
         margin-bottom: 32px;
@@ -126,6 +144,19 @@
         border: 1px solid var(--color-border);
         border-radius: var(--border-radius);
         box-shadow: var(--shadow-sm);
+    }
+
+    #prev-month {
+        justify-self: start; /* 左寄せ */
+    }
+
+    #calendar-title {
+        justify-self: center; /* センター */
+        text-align: center;
+    }
+
+    #next-month {
+        justify-self: end; /* 右寄せ */
     }
 
     #calendar-header h2 {
@@ -351,10 +382,14 @@
             gap: 20px;
         }
         #calendar-header {
-            flex-direction: column;
+            grid-template-columns: 1fr;
             gap: 12px;
             padding: 16px;
             text-align: center;
+        }
+
+        #prev-month, #next-month, #calendar-title {
+            justify-self: center; /* タブレットではすべて中央 */
         }
         #calendar-table th {
             font-size: 0.8rem;
@@ -406,7 +441,7 @@
         }
 
         #calendar-header h2 {
-            font-size: 1.1rem;
+            font-size: 0.8rem;
         }
         #calendar-header button {
             padding: 8px 14px;
@@ -458,8 +493,9 @@
         }
     }
 </style>
-{% endblock %}
-{% block content %}
+</head>
+<body>
+
 <div class="container">
     <div class="tenant-info-card">
         <div class="tenant-header">
@@ -580,8 +616,7 @@
         </form>
     </div>
 </div>
-{% endblock %}
-{% block extra_js %}
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     // --- 要素の取得 ---
@@ -876,4 +911,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 </script>
-{% endblock %}
+
+</body>
+</html>
