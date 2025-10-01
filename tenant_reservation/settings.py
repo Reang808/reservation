@@ -23,14 +23,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY =True
-# config('SECRET_KEY', default='django-insecure-ci^#s3(v54#teb63ha-#nvoo@h_#8m)z@+cva13%!f@7k4xo$^')
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-ci^#s3(v54#teb63ha-#nvoo@h_#8m)z@+cva13%!f@7k4xo$^')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 # config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['reang-reserve.jp', 'www.reang-reserve.jp', '163.44.123.195', '127.0.0.1:8000', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['reang-reserve.jp', 'www.reang-reserve.jp', '163.44.123.195',]
 #'127.0.0.1:8000', '127.0.0.1', 'localhost' 
 
 
